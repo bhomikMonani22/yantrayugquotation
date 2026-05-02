@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yantrayug — Order Fulfillment Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --yellow: #F5C800;
+    --dark: #111111;
+    --mid: #1E1E1E;
+    --panel: #252525;
+    --border: #333333;
+    --green: #22C55E;
+    --orange: #F97316;
+    --red: #EF4444;
+    --muted: #888;
+    --text: #F0F0F0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    border-bottom: 2px solid var(--yellow);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--mid);
+  }
+
+  header .logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--yellow);
+  }
+
+  header .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .workspace {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 61px);
+  }
+
+  /* ---- LEFT PANEL ---- */
+  .left-panel {
+    background: var(--mid);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 8px;
+  }
+
+  .upload-box {
+    background: var(--panel);
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .upload-box:hover { border-color: var(--yellow); background: #2a2a2a; }
+  .upload-box.loaded { border-style: solid; border-color: var(--green); }
+  .upload-box input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  .upload-icon { font-size: 24px; margin-bottom: 6px; }
+  .upload-title { font-size: 13px; font-weight: 700; }
+  .upload-hint { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+  .upload-status { font-size: 11px; color: var(--green); margin-top: 6px; font-family: 'Space Mono', monospace; display: none; }
+
+  textarea {
+    width: 100%;
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 12px;
+    resize: vertical;
+    min-height: 200px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.7;
+  }
+  textarea:focus { border-color: var(--yellow); }
+  textarea::placeholder { color: var(--muted); }
+
+  .btn-run {
+    background: var(--yellow);
+    color: var(--dark);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-run:hover { opacity: 0.9; }
+  .btn-run:active { transform: scale(0.98); }
+  .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .stat-chip {
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat-chip .num { font-size: 22px; font-weight: 800; }
+  .stat-chip .lbl { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+  .stat-chip.green .num { color: var(--green); }
+  .stat-chip.orange .num { color: var(--orange); }
+  .stat-chip.red .num { color: var(--red); }
+
+  /* ---- RIGHT PANEL ---- */
+  .right-panel {
+    padding: 28px 28px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .report-block {
+    background: var(--panel);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    gap: 12px;
+  }
+  .report-header.green-hdr { background: rgba(34,197,94,0.12); border-bottom: 1px solid rgba(34,197,94,0.3); }
+  .report-header.orange-hdr { background: rgba(249,115,22,0.12); border-bottom: 1px solid rgba(249,115,22,0.3); }
+  .report-header.red-hdr { background: rgba(239,68,68,0.12); border-bottom: 1px solid rgba(239,68,68,0.3); }
+
+  .report-title {
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .report-title .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .green-dot { background: var(--green); }
+  .orange-dot { background: var(--orange); }
+  .red-dot { background: var(--red); }
+
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+  .badge.green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge.orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+  .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
+
+  .btn-export {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-export:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+  tbody td {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+  }
+  tbody td.part-no { color: var(--yellow); font-size: 12px; }
+  tbody td.qty-order { color: var(--text); font-weight: 700; }
+  tbody td.qty-avail { color: var(--green); font-weight: 700; }
+  tbody td.qty-ss { color: var(--orange); font-weight: 700; }
+  tbody td.qty-na { color: var(--red); font-weight: 700; }
+
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .placeholder-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--muted);
+    flex: 1;
+    min-height: 300px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    line-height: 2;
+  }
+  .placeholder-area .big-icon { font-size: 48px; opacity: 0.3; }
+
+  .progress-bar-wrap {
+    background: var(--border);
+    border-radius: 4px;
+    height: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .progress-bar.green { background: var(--green); }
+  .progress-bar.orange { background: var(--orange); }
+
+  @media (max-width: 768px) {
+    .workspace { grid-template-columns: 1fr; }
+    .left-panel { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">⚡ YANTRAYUG</div>
+    <div class="subtitle">Order Fulfillment Analyzer</div>
+  </div>
+</header>
+
+<div class="workspace">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <div>
+      <div class="section-label">01 — YHH Stock</div>
+      <div class="upload-box" id="yhhBox">
+        <input type="file" accept=".xlsx,.xls" id="yhhFile">
+        <div class="upload-icon">📦</div>
+        <div class="upload-title">Upload YHH Stock</div>
+        <div class="upload-hint">Our stock file (.xlsx)</div>
+        <div class="upload-status" id="yhhStatus"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">02 — SS Stock (PC)</div>
+      <div class="upload-box" id="ssBox">
+        <input type="file" accept=".xlsx,.xls" id="ssFile">
+        <div class="upload-icon">🏭</div>
+        <div class="upload-title">Upload SS Stock</div>
+        <div class="upload-hint">Supplier stock file (.xlsx)</div>
+        <div class="upload-status" id="ssStatus"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">03 — Paste Order</div>
+      <textarea id="orderInput" placeholder="PART NO&#9;BALANCE&#10;12245GB4305S&#9;55&#10;14510AABA00S&#9;50&#10;..."></textarea>
+    </div>
+
+    <button class="btn-run" id="runBtn" onclick="runReport()">▶ Generate Report</button>
+
+    <div class="stats-row" id="statsRow" style="display:none">
+      <div class="stat-chip green"><div class="num" id="statYHH">0</div><div class="lbl">YHH Available</div></div>
+      <div class="stat-chip orange"><div class="num" id="statSS">0</div><div class="lbl">Order from SS</div></div>
+      <div class="stat-chip red"><div class="num" id="statNone">0</div><div class="lbl">Not Found</div></div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel" id="rightPanel">
+    <div class="placeholder-area">
+      <div class="big-icon">📋</div>
+      <div>Upload both stock files,<br>paste the order, then<br><strong style="color:var(--yellow)">Generate Report</strong></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let yhhData = null; // Map: partNo => qty
+  let ssData = null;  // Map: partNo => qty
+
+  function normalizePartNo(str) {
+    return String(str || '').trim().toUpperCase().replace(/\s+/g, '');
+  }
+
+  // Parse YHH stock xlsx
+  // Structure: col "PART NO " → part, col "YHH" → qty
+  function parseYHH(arrayBuffer) {
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+    const map = new Map();
+    for (const row of rows) {
+      // find part no key (trim all keys)
+      let partKey = Object.keys(row).find(k => k.trim().toUpperCase() === 'PART NO');
+      let qtyKey = Object.keys(row).find(k => k.trim().toUpperCase() === 'YHH');
+      if (!partKey || !qtyKey) continue;
+      const part = normalizePartNo(row[partKey]);
+      const qty = parseFloat(row[qtyKey]) || 0;
+      if (part) map.set(part, (map.get(part) || 0) + qty);
+    }
+    return map;
+  }
+
+  // Parse SS stock xlsx
+  // Structure: header at row index 5, Part Number = col 1, Stock on Hand = col 4
+  function parseSS(arrayBuffer) {
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    const map = new Map();
+    // Find header row
+    let headerIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      // Look for "Part Number" in the row
+      if (row.some(cell => String(cell).trim().toLowerCase() === 'part number')) {
+        headerIdx = i;
+        break;
+      }
+    }
+    if (headerIdx === -1) return map;
+    const headers = rows[headerIdx].map(h => String(h).trim().toLowerCase());
+    const partIdx = headers.indexOf('part number');
+    // Stock on Hand
+    const stockIdx = headers.findIndex(h => h.includes('stock on hand') || h.includes('stock'));
+
+    for (let i = headerIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || !row[partIdx]) continue;
+      const part = normalizePartNo(row[partIdx]);
+      const qty = parseFloat(row[stockIdx]) || 0;
+      if (part && part !== 'PART NUMBER') map.set(part, (map.get(part) || 0) + qty);
+    }
+    return map;
+  }
+
+  function parseOrder(text) {
+    const lines = text.trim().split('\n');
+    const items = [];
+    for (const line of lines) {
+      const parts = line.split(/\t|,/);
+      if (parts.length < 2) continue;
+      const partNo = normalizePartNo(parts[0]);
+      const qty = parseFloat(parts[1]) || 0;
+      if (partNo && qty > 0 && partNo.toLowerCase() !== 'part no' && partNo.toLowerCase() !== 'partno') {
+        items.push({ partNo, qty });
+      }
+    }
+    return items;
+  }
+
+  // File upload handlers
+  document.getElementById('yhhFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const buf = await file.arrayBuffer();
+    yhhData = parseYHH(buf);
+    document.getElementById('yhhStatus').style.display = 'block';
+    document.getElementById('yhhStatus').textContent = `✓ Loaded — ${yhhData.size} parts`;
+    document.getElementById('yhhBox').classList.add('loaded');
+  });
+
+  document.getElementById('ssFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const buf = await file.arrayBuffer();
+    ssData = parseSS(buf);
+    document.getElementById('ssStatus').style.display = 'block';
+    document.getElementById('ssStatus').textContent = `✓ Loaded — ${ssData.size} parts`;
+    document.getElementById('ssBox').classList.add('loaded');
+  });
+
+  function runReport() {
+    const orderText = document.getElementById('orderInput').value.trim();
+    if (!yhhData) { alert('Please upload YHH stock file first.'); return; }
+    if (!ssData) { alert('Please upload SS stock file first.'); return; }
+    if (!orderText) { alert('Please paste the order.'); return; }
+
+    const order = parseOrder(orderText);
+    if (order.length === 0) { alert('No valid order lines found.'); return; }
+
+    const yhhAvailable = [];
+    const ssOrder = [];
+    const notFound = [];
+
+    for (const { partNo, qty } of order) {
+      const yhhQty = yhhData.get(partNo) || 0;
+      const ssQty = ssData.get(partNo) || 0;
+
+      if (yhhQty >= qty) {
+        // Fully available in YHH
+        yhhAvailable.push({ partNo, orderQty: qty, yhhQty });
+      } else if (yhhQty > 0) {
+        // Partially in YHH, need some from SS
+        const needed = qty - yhhQty;
+        yhhAvailable.push({ partNo, orderQty: yhhQty, yhhQty, partial: true });
+        if (ssQty > 0) {
+          const canGet = Math.min(needed, ssQty);
+          ssOrder.push({ partNo, orderQty: qty, yhhQty, ssQty, needed, canGet });
+        } else {
+          notFound.push({ partNo, orderQty: qty, yhhQty, ssQty: 0, shortfall: needed });
+        }
+      } else {
+        // Not in YHH at all
+        if (ssQty > 0) {
+          ssOrder.push({ partNo, orderQty: qty, yhhQty: 0, ssQty, needed: qty, canGet: Math.min(qty, ssQty) });
+        } else {
+          notFound.push({ partNo, orderQty: qty, yhhQty: 0, ssQty: 0, shortfall: qty });
+        }
+      }
+    }
+
+    // Update stats
+    document.getElementById('statsRow').style.display = 'grid';
+    document.getElementById('statYHH').textContent = yhhAvailable.length;
+    document.getElementById('statSS').textContent = ssOrder.length;
+    document.getElementById('statNone').textContent = notFound.length;
+
+    const rp = document.getElementById('rightPanel');
+    rp.innerHTML = '';
+
+    // === TABLE 1: Available in YHH ===
+    const t1 = document.createElement('div');
+    t1.className = 'report-block';
+    t1.innerHTML = `
+      <div class="report-header green-hdr">
+        <div class="report-title"><span class="dot green-dot"></span> Available in YHH Stock</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge green">${yhhAvailable.length} items</span>
+          <button class="btn-export" onclick="exportCSV('yhh')">↓ CSV</button>
+        </div>
+      </div>
+      <table id="tblYHH">
+        <thead><tr>
+          <th>Part No</th>
+          <th>Order Qty</th>
+          <th>YHH Stock</th>
+          <th>Coverage</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody>
+          ${yhhAvailable.map(r => {
+            const pct = Math.min(100, Math.round((r.yhhQty / r.orderQty) * 100));
+            const status = r.partial ? `<span style="color:var(--orange);font-size:11px">PARTIAL</span>` : `<span style="color:var(--green);font-size:11px">FULL</span>`;
+            return `<tr>
+              <td class="part-no">${r.partNo}</td>
+              <td class="qty-order">${r.orderQty}</td>
+              <td class="qty-avail">${r.yhhQty}</td>
+              <td style="min-width:120px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="progress-bar-wrap" style="width:80px;flex-shrink:0"><div class="progress-bar ${r.partial ? 'orange' : 'green'}" style="width:${pct}%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">${pct}%</span>
+                </div>
+              </td>
+              <td>${status}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+    rp.appendChild(t1);
+
+    // === TABLE 2: Order from SS ===
+    const t2 = document.createElement('div');
+    t2.className = 'report-block';
+    t2.innerHTML = `
+      <div class="report-header orange-hdr">
+        <div class="report-title"><span class="dot orange-dot"></span> Order from SS to Fulfill</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge orange">${ssOrder.length} items</span>
+          <button class="btn-export" onclick="exportCSV('ss')">↓ CSV</button>
+        </div>
+      </div>
+      <table id="tblSS">
+        <thead><tr>
+          <th>Part No</th>
+          <th>Order Qty</th>
+          <th>YHH Stock</th>
+          <th>Need from SS</th>
+          <th>SS Available</th>
+          <th>Can Get</th>
+        </tr></thead>
+        <tbody>
+          ${ssOrder.length === 0 ? '<tr><td colspan="6" class="empty-state">No items to order from SS</td></tr>' :
+            ssOrder.map(r => `<tr>
+              <td class="part-no">${r.partNo}</td>
+              <td class="qty-order">${r.orderQty}</td>
+              <td style="color:var(--muted)">${r.yhhQty}</td>
+              <td class="qty-ss">${r.needed}</td>
+              <td style="color:var(--text)">${r.ssQty}</td>
+              <td class="qty-ss">${r.canGet}${r.canGet < r.needed ? ' ⚠' : ' ✓'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    rp.appendChild(t2);
+
+    // === TABLE 3: Not Found ===
+    const t3 = document.createElement('div');
+    t3.className = 'report-block';
+    t3.innerHTML = `
+      <div class="report-header red-hdr">
+        <div class="report-title"><span class="dot red-dot"></span> Not Available in YHH or SS</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge red">${notFound.length} items</span>
+          <button class="btn-export" onclick="exportCSV('none')">↓ CSV</button>
+        </div>
+      </div>
+      <table id="tblNone">
+        <thead><tr>
+          <th>Part No</th>
+          <th>Order Qty</th>
+          <th>YHH Stock</th>
+          <th>SS Stock</th>
+          <th>Shortfall</th>
+        </tr></thead>
+        <tbody>
+          ${notFound.length === 0 ? '<tr><td colspan="5" class="empty-state">All items found ✓</td></tr>' :
+            notFound.map(r => `<tr>
+              <td class="part-no">${r.partNo}</td>
+              <td class="qty-order">${r.orderQty}</td>
+              <td class="qty-na">0</td>
+              <td class="qty-na">0</td>
+              <td class="qty-na">${r.shortfall}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    rp.appendChild(t3);
+
+    // Store for export
+    window._reportData = { yhhAvailable, ssOrder, notFound };
+  }
+
+  function exportCSV(type) {
+    if (!window._reportData) return;
+    const { yhhAvailable, ssOrder, notFound } = window._reportData;
+    let csv = '';
+    let filename = '';
+
+    if (type === 'yhh') {
+      csv = 'PART NO,ORDER QTY,YHH STOCK,STATUS\n';
+      csv += yhhAvailable.map(r => `${r.partNo},${r.orderQty},${r.yhhQty},${r.partial ? 'PARTIAL' : 'FULL'}`).join('\n');
+      filename = 'YHH_Available.csv';
+    } else if (type === 'ss') {
+      csv = 'PART NO,ORDER QTY,YHH STOCK,NEED FROM SS,SS AVAILABLE,CAN GET\n';
+      csv += ssOrder.map(r => `${r.partNo},${r.orderQty},${r.yhhQty},${r.needed},${r.ssQty},${r.canGet}`).join('\n');
+      filename = 'SS_Order_List.csv';
+    } else {
+      csv = 'PART NO,ORDER QTY,SHORTFALL\n';
+      csv += notFound.map(r => `${r.partNo},${r.orderQty},${r.shortfall}`).join('\n');
+      filename = 'Not_Available.csv';
+    }
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+</script>
+</body>
+</html>
