@@ -9,100 +9,89 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['Geist', 'system-ui', 'sans-serif'],
-          serif: ['Instrument Serif', 'Georgia', 'serif'],
-          mono: ['JetBrains Mono', 'monospace'],
-        },
-        colors: {
-          cream: { DEFAULT: '#F8F4ED', dark: '#EFE9DD', deep: '#E8E1D2' },
-          ink:   { DEFAULT: '#0A0A0A', soft: '#1A1A1A', mute: '#6B6B6B', faint: '#A8A39A' },
-          lav:   { 50:'#F4F0FF', 100:'#E6DCFF', 200:'#D4C5FF', 300:'#B8A6FF', 500:'#8E78F0', 700:'#5840C8' },
-          peach: { 100:'#FFE5D2', 300:'#FDD7B5', 500:'#FFB28A' },
-          mint:  { 300:'#B5F0D8', 500:'#5FD9A0' },
-        },
-        boxShadow: {
-          soft: '0 1px 2px rgba(10,10,10,0.04), 0 4px 16px rgba(10,10,10,0.04)',
-          card: '0 1px 0 rgba(10,10,10,0.03), 0 8px 28px -8px rgba(10,10,10,0.10)',
-          lift: '0 1px 0 rgba(10,10,10,0.03), 0 18px 48px -12px rgba(10,10,10,0.18)',
-        },
-      }
-    }
+    theme: { extend: {
+      fontFamily: {
+        sans: ['Geist','system-ui','sans-serif'],
+        serif: ['Instrument Serif','Georgia','serif'],
+        mono: ['JetBrains Mono','monospace'],
+      },
+      colors: {
+        cream: { DEFAULT:'#F8F4ED', dark:'#EFE9DD', deep:'#E8E1D2' },
+        ink:   { DEFAULT:'#0A0A0A', soft:'#1A1A1A', mute:'#6B6B6B', faint:'#A8A39A' },
+        lav:   { 50:'#F4F0FF',100:'#E6DCFF',200:'#D4C5FF',300:'#B8A6FF',500:'#8E78F0',700:'#5840C8' },
+        peach: { 100:'#FFE5D2',300:'#FDD7B5',500:'#FFB28A' },
+        mint:  { 300:'#B5F0D8',500:'#5FD9A0' },
+      },
+      boxShadow: {
+        soft:'0 1px 2px rgba(10,10,10,0.04), 0 4px 16px rgba(10,10,10,0.04)',
+        card:'0 1px 0 rgba(10,10,10,0.03), 0 8px 28px -8px rgba(10,10,10,0.10)',
+        lift:'0 1px 0 rgba(10,10,10,0.03), 0 18px 48px -12px rgba(10,10,10,0.18)',
+      },
+    }}
   }
 </script>
 <style>
   input, select, textarea { font-size: 16px; }
-  @media (min-width: 640px) { input, select, textarea { font-size: 14px; } }
-  body { letter-spacing: -0.01em; }
-  h1, h2, h3 { letter-spacing: -0.025em; }
+  @media (min-width:640px){ input,select,textarea { font-size:14px; } }
+  body { letter-spacing:-0.01em; }
+  h1,h2,h3 { letter-spacing:-0.025em; }
 
-  .orb { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.55; pointer-events: none; z-index: 0; }
-  .orb-1 { width: 480px; height: 480px; background: #E6DCFF; top: -180px; left: -180px; animation: float1 22s ease-in-out infinite; }
-  .orb-2 { width: 560px; height: 560px; background: #FFE5D2; bottom: -240px; right: -200px; animation: float2 26s ease-in-out infinite; }
-  .orb-3 { width: 360px; height: 360px; background: #B8A6FF; top: 50%; right: -120px; opacity: 0.35; animation: float3 18s ease-in-out infinite; }
-  @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,60px) scale(1.08); } }
-  @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-50px,-80px) scale(1.05); } }
-  @keyframes float3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,40px) scale(0.92); } }
+  .orb { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.55; pointer-events:none; z-index:0; }
+  .orb-1 { width:480px;height:480px;background:#E6DCFF;top:-180px;left:-180px;animation:float1 22s ease-in-out infinite; }
+  .orb-2 { width:560px;height:560px;background:#FFE5D2;bottom:-240px;right:-200px;animation:float2 26s ease-in-out infinite; }
+  .orb-3 { width:360px;height:360px;background:#B8A6FF;top:50%;right:-120px;opacity:0.35;animation:float3 18s ease-in-out infinite; }
+  @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(40px,60px) scale(1.08);} }
+  @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-50px,-80px) scale(1.05);} }
+  @keyframes float3 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-30px,40px) scale(0.92);} }
 
   .grain {
-    position: fixed; inset: 0; pointer-events: none;
-    opacity: 0.04; mix-blend-mode: multiply; z-index: 1;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+    position:fixed; inset:0; pointer-events:none; opacity:0.04; mix-blend-mode:multiply; z-index:1;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
   }
 
-  .pulse-dot {
-    width: 8px; height: 8px; background: #5FD9A0;
-    border-radius: 50%; box-shadow: 0 0 0 0 rgba(95,217,160,0.55);
-    animation: pulse 1.8s infinite;
-  }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(95,217,160,0.55); }
-    70% { box-shadow: 0 0 0 10px rgba(95,217,160,0); }
-    100% { box-shadow: 0 0 0 0 rgba(95,217,160,0); }
-  }
+  .pulse-dot { width:8px;height:8px;background:#5FD9A0;border-radius:50%;box-shadow:0 0 0 0 rgba(95,217,160,0.55);animation:pulse 1.8s infinite; }
+  .pulse-dot.off { background:#A8A39A; animation:none; box-shadow:none; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(95,217,160,0.55);} 70%{box-shadow:0 0 0 10px rgba(95,217,160,0);} 100%{box-shadow:0 0 0 0 rgba(95,217,160,0);} }
 
-  .bar {
-    width: 3px; background: currentColor;
-    border-radius: 2px; transform-origin: bottom;
-    animation: barpulse 2.4s cubic-bezier(.2,.8,.2,1) infinite;
-  }
-  .bar:nth-child(1) { animation-delay: 0s;   height: 12px; }
-  .bar:nth-child(2) { animation-delay: 0.2s; height: 18px; }
-  .bar:nth-child(3) { animation-delay: 0.4s; height: 10px; }
-  .bar:nth-child(4) { animation-delay: 0.6s; height: 22px; }
-  .bar:nth-child(5) { animation-delay: 0.8s; height: 14px; }
-  @keyframes barpulse { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(1.25); } }
+  .bar { width:3px;background:currentColor;border-radius:2px;transform-origin:bottom;animation:barpulse 2.4s cubic-bezier(.2,.8,.2,1) infinite; }
+  .bar:nth-child(1){animation-delay:0s;height:12px;}
+  .bar:nth-child(2){animation-delay:.2s;height:18px;}
+  .bar:nth-child(3){animation-delay:.4s;height:10px;}
+  .bar:nth-child(4){animation-delay:.6s;height:22px;}
+  .bar:nth-child(5){animation-delay:.8s;height:14px;}
+  @keyframes barpulse { 0%,100%{transform:scaleY(1);} 50%{transform:scaleY(1.25);} }
 
-  .rise { opacity: 0; transform: translateY(14px); animation: rise 0.8s cubic-bezier(.2,.8,.2,1) forwards; }
-  .rise-1 { animation-delay: 0.1s; }
-  .rise-2 { animation-delay: 0.2s; }
-  .rise-3 { animation-delay: 0.3s; }
-  .rise-4 { animation-delay: 0.4s; }
-  .rise-5 { animation-delay: 0.5s; }
-  .rise-6 { animation-delay: 0.6s; }
-  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  .rise { opacity:0;transform:translateY(14px);animation:rise .8s cubic-bezier(.2,.8,.2,1) forwards; }
+  .rise-1{animation-delay:.1s;} .rise-2{animation-delay:.2s;} .rise-3{animation-delay:.3s;}
+  .rise-4{animation-delay:.4s;} .rise-5{animation-delay:.5s;} .rise-6{animation-delay:.6s;}
+  @keyframes rise { to { opacity:1;transform:translateY(0);} }
 
-  .card-lift { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s cubic-bezier(.2,.8,.2,1); }
-  .card-lift:hover { transform: translateY(-2px); }
+  .card-lift { transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s cubic-bezier(.2,.8,.2,1); }
+  .card-lift:hover { transform:translateY(-2px); }
 
-  .scroll-area::-webkit-scrollbar { height: 6px; width: 6px; }
-  .scroll-area::-webkit-scrollbar-track { background: transparent; }
-  .scroll-area::-webkit-scrollbar-thumb { background: rgba(10,10,10,0.15); border-radius: 3px; }
+  .scroll-area::-webkit-scrollbar { height:6px;width:6px; }
+  .scroll-area::-webkit-scrollbar-track { background:transparent; }
+  .scroll-area::-webkit-scrollbar-thumb { background:rgba(10,10,10,0.15);border-radius:3px; }
 
-  .drag-over { border-color: #5840C8 !important; background-color: rgba(244,240,255,0.5) !important; }
-  ::selection { background: #E6DCFF; color: #0A0A0A; }
-  * { -webkit-tap-highlight-color: transparent; }
+  .drag-over { border-color:#5840C8 !important;background-color:rgba(244,240,255,0.5) !important; }
+  ::selection { background:#E6DCFF;color:#0A0A0A; }
+  * { -webkit-tap-highlight-color:transparent; }
 
   .sticky-nav {
-    position: sticky; top: 0; z-index: 20;
-    background: rgba(248,244,237,0.88);
-    backdrop-filter: saturate(140%) blur(8px);
-    -webkit-backdrop-filter: saturate(140%) blur(8px);
+    position:sticky;top:0;z-index:20;background:rgba(248,244,237,0.88);
+    backdrop-filter:saturate(140%) blur(8px);-webkit-backdrop-filter:saturate(140%) blur(8px);
   }
+  .modal-overlay {
+    position:fixed;inset:0;z-index:50;background:rgba(10,10,10,0.45);
+    backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;
+  }
+  .spin { animation:spin 0.7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .seg { height:100%;transition:width .6s cubic-bezier(.2,.8,.2,1); }
 </style>
 </head>
 <body class="bg-cream text-ink font-sans antialiased min-h-screen overflow-x-hidden">
@@ -125,84 +114,61 @@
       </div>
     </div>
     <div class="flex items-center gap-2 px-3 py-1.5 bg-white/60 backdrop-blur rounded-full border border-cream-deep">
-      <span class="pulse-dot"></span>
-      <span class="text-[11px] uppercase tracking-wider text-ink-mute font-medium">Live</span>
+      <span class="pulse-dot off" id="cloudDot"></span>
+      <span class="text-[11px] uppercase tracking-wider text-ink-mute font-medium" id="cloudStatus">Connecting</span>
     </div>
   </header>
 
-  <section class="max-w-7xl mx-auto px-5 sm:px-8 pt-10 sm:pt-20 pb-10 sm:pb-14">
+  <section class="max-w-7xl mx-auto px-5 sm:px-8 pt-8 sm:pt-14 pb-8 sm:pb-10">
     <div class="grid lg:grid-cols-12 gap-6 items-end">
       <div class="lg:col-span-8">
         <div class="rise rise-2 text-[11px] uppercase tracking-[0.18em] text-lav-700 font-mono mb-5 flex items-center gap-2">
           <span class="inline-block w-8 h-px bg-lav-700"></span>
-          PBO Generator · v2
+          Live Fulfillment · v3 · Cloud
         </div>
-        <h1 class="rise rise-3 text-[44px] sm:text-7xl lg:text-[88px] font-medium leading-[0.92] mb-6 sm:mb-8">
+        <h1 class="rise rise-3 text-[40px] sm:text-6xl lg:text-[78px] font-medium leading-[0.92] mb-5 sm:mb-6">
           Order fulfillment,<br/>
-          <span class="font-serif italic font-normal text-lav-700">clarified.</span>
+          <span class="font-serif italic font-normal text-lav-700">always live.</span>
         </h1>
         <p class="rise rise-4 text-base sm:text-lg text-ink-mute max-w-xl leading-relaxed">
-          Drop stock files, packing slip, and the order. Get a PBO list,
-          a YHH pick list, and a shortfall report — instantly.
-          <span class="text-ink-faint">No spreadsheet juggling.</span>
+          Save an order once. Keep adding packing slips as you pack.
+          The fulfillment report stays current — open it any time, any device.
         </p>
       </div>
       <div class="lg:col-span-4 rise rise-5">
         <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card p-5 sm:p-6 card-lift">
           <div class="flex items-center justify-between mb-3">
-            <div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">Session</div>
+            <div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">Active invoice</div>
             <div class="flex items-end gap-1 h-6 text-lav-500">
               <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
             </div>
           </div>
-          <div class="text-3xl font-medium tracking-tight mb-1">
-            <span id="kpiOrders">0</span><span class="text-ink-faint text-xl"> orders</span>
-          </div>
-          <div class="text-xs text-ink-mute" id="kpiOrderSub">Awaiting input</div>
+          <div class="text-2xl font-medium tracking-tight mb-1 truncate" id="kpiInvoice">— none —</div>
+          <div class="text-xs text-ink-mute" id="kpiParty">Open or create an invoice</div>
           <div class="mt-4 pt-4 border-t border-cream-deep/60 grid grid-cols-3 gap-2">
-            <div><div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">Files</div><div class="text-lg font-medium mt-0.5" id="kpiFiles">0</div></div>
-            <div><div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">Stock</div><div class="text-lg font-medium mt-0.5" id="kpiStock">0</div></div>
-            <div><div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">PBO</div><div class="text-lg font-medium mt-0.5" id="kpiPBO">—</div></div>
+            <div><div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">Packed</div><div class="text-lg font-medium mt-0.5 text-mint-500" id="kpiPacked">—</div></div>
+            <div><div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">In YHH</div><div class="text-lg font-medium mt-0.5 text-lav-700" id="kpiYhh">—</div></div>
+            <div><div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">PBO</div><div class="text-lg font-medium mt-0.5 text-peach-500" id="kpiPbo">—</div></div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="fileRegistry" class="max-w-7xl mx-auto px-5 sm:px-8 pb-6 hidden">
-    <div class="bg-white/70 backdrop-blur rounded-2xl border border-cream-deep/70 px-5 py-4 flex flex-wrap items-center gap-3">
-      <div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono">Files loaded</div>
-      <div id="fileRegistryList" class="flex flex-wrap gap-2"></div>
+  <section class="max-w-7xl mx-auto px-5 sm:px-8 pb-6">
+    <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card p-4 sm:p-5">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="text-[10px] uppercase tracking-[0.18em] text-ink-mute font-mono">Global stock</div>
+        <div class="flex flex-wrap items-center gap-3" id="stockStrip">
+          <div class="text-xs text-ink-faint font-mono">loading…</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="max-w-7xl mx-auto px-5 sm:px-8 pb-8">
-    <div class="flex items-baseline justify-between mb-6 rise rise-6">
-      <h2 class="text-2xl sm:text-3xl font-medium">
-        Four inputs.
-        <span class="font-serif italic text-ink-mute font-normal">One report.</span>
-      </h2>
-      <button onclick="resetAll()" class="text-[11px] uppercase tracking-wider text-ink-mute hover:text-ink font-mono transition">Reset all</button>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-      <div class="zone-card bg-white rounded-2xl border border-cream-deep/70 shadow-card p-5 card-lift" data-zone="yhh"></div>
-      <div class="zone-card bg-white rounded-2xl border border-cream-deep/70 shadow-card p-5 card-lift" data-zone="pc"></div>
-      <div class="zone-card bg-white rounded-2xl border border-cream-deep/70 shadow-card p-5 card-lift" data-zone="pack"></div>
-      <div class="zone-card bg-white rounded-2xl border border-cream-deep/70 shadow-card p-5 card-lift" data-zone="order"></div>
-    </div>
-  </section>
+  <section class="max-w-7xl mx-auto px-5 sm:px-8 pb-10" id="workspace"></section>
 
-  <section class="max-w-7xl mx-auto px-5 sm:px-8 pb-16 text-center">
-    <button id="generateBtn" onclick="generateReport()" class="bg-ink text-cream rounded-full px-8 sm:px-10 py-4 text-[15px] font-medium hover:bg-ink-soft transition inline-flex items-center gap-3 shadow-lift opacity-40 cursor-not-allowed">
-      <span>Generate Reports</span>
-      <span class="text-lg">▸</span>
-    </button>
-    <div class="text-[11px] uppercase tracking-wider text-ink-faint font-mono mt-4" id="generateStatus">
-      Upload YHH, PC stock, and the order to begin
-    </div>
-  </section>
-
-  <section id="resultsSection" class="max-w-7xl mx-auto px-5 sm:px-8 pb-24 hidden">
+  <section id="reportSection" class="max-w-7xl mx-auto px-5 sm:px-8 pb-24 hidden">
     <div class="sticky-nav -mx-5 sm:mx-0 px-5 sm:px-0 py-3">
       <nav class="inline-flex p-1 bg-cream-dark/60 rounded-full border border-cream-deep/70 overflow-x-auto max-w-full" id="tabNav">
         <button class="tab-btn px-4 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-medium transition bg-ink text-cream whitespace-nowrap" data-tab="overview">Overview</button>
@@ -212,603 +178,896 @@
         <button class="tab-btn px-4 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-medium transition text-ink-mute hover:text-ink whitespace-nowrap" data-tab="short">Shortfall <span class="text-[10px] opacity-60 ml-0.5" id="tabCountShort">0</span></button>
       </nav>
     </div>
-    <div class="mt-6" id="resultsContent"></div>
+    <div class="mt-6" id="reportContent"></div>
   </section>
 
   <footer class="max-w-7xl mx-auto px-5 sm:px-8 py-8 border-t border-cream-deep/60 text-[11px] uppercase tracking-wider text-ink-faint font-mono flex flex-wrap items-center justify-between gap-2">
-    <div>Yantrayug · Order Brain · v2</div>
+    <div>Yantrayug · Order Brain · v3 · Supabase</div>
     <div>Made in PCMC · Pune</div>
   </footer>
 
 </div>
 
-<!-- Safelist for Tailwind JIT -->
-<div class="hidden text-mint-500 text-mint-300 text-lav-700 text-lav-500 text-peach-500 text-peach-300 text-peach-100 bg-mint-300 bg-mint-500 bg-lav-100 bg-lav-200 bg-peach-100 bg-peach-300 bg-peach-500 bg-ink"></div>
+<div id="modal" class="modal-overlay hidden"><div id="modalCard" class="bg-cream rounded-2xl border border-cream-deep shadow-lift w-full max-w-lg my-8"></div></div>
+
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] hidden">
+  <div class="bg-ink text-cream rounded-full px-5 py-3 text-sm font-medium shadow-lift" id="toastMsg"></div>
+</div>
+
+<div class="hidden text-mint-500 text-mint-300 text-lav-700 text-lav-500 text-peach-500 text-peach-300 bg-mint-300 bg-mint-500 bg-lav-100 bg-lav-200 bg-lav-700 bg-peach-100 bg-peach-300 bg-peach-500 bg-ink"></div>
 
 <script>
-// === STATE ===
+// ============================================================
+// SUPABASE
+// ============================================================
+const SUPABASE_URL = 'https://wqdpvalgkfqyfntalfxd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Amja9S9VzUXfPTwPJitjDg_q06Oj5cW';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================================
+// STATE
+// ============================================================
 const state = {
-  files: [],
-  zones: {
-    yhh:   { label:'YHH Stock',    icon:'📦', sub:'Our warehouse',  idx:'01', fileIdx:-1, sheetIdx:-1, headerRow:0, partCol:-1, qtyCol:-1, map:new Map() },
-    pc:    { label:'PC Stock',     icon:'🏭', sub:'Super stockist', idx:'02', fileIdx:-1, sheetIdx:-1, headerRow:0, partCol:-1, qtyCol:-1, map:new Map() },
-    pack:  { label:'Packing Slip', icon:'📋', sub:'Already packed', idx:'03', fileIdx:-1, sheetIdx:-1, headerRow:0, partCol:-1, qtyCol:-1, map:new Map(), optional:true },
-    order: { label:'Order',        icon:'📝', sub:'What to fulfill',idx:'04', fileIdx:-1, sheetIdx:-1, headerRow:0, partCol:-1, qtyCol:-1, descCol:-1, list:[], pasted:'' },
-  },
+  stock: { yhh:null, ss:null },
+  invoices: [],
+  active: null,
   report: null,
+  realtimeChan: null,
 };
 
+// ============================================================
+// HELPERS
+// ============================================================
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
-const norm = s => String(s ?? '').trim().toUpperCase().replace(/[-\s_]/g, '');
+const norm = s => String(s ?? '').trim().toUpperCase().replace(/[-\s_]/g,'');
 const toNum = v => {
-  if (v === null || v === undefined || v === '') return 0;
-  const n = parseFloat(String(v).replace(/,/g, ''));
+  if (v===null||v===undefined||v==='') return 0;
+  const n = parseFloat(String(v).replace(/,/g,''));
   return isNaN(n) ? 0 : n;
 };
-
-async function ingestFile(file) {
-  const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf, { type: 'array' });
-  const sheets = wb.SheetNames.map(name => ({
-    name,
-    rows: XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '' }),
-  }));
-  const existIdx = state.files.findIndex(f => f.name === file.name);
-  if (existIdx !== -1) { state.files[existIdx] = { name: file.name, sheets }; return existIdx; }
-  state.files.push({ name: file.name, sheets });
-  return state.files.length - 1;
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function timeAgo(iso) {
+  if (!iso) return 'never';
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff/60000), h = Math.floor(diff/3600000), d = Math.floor(diff/86400000);
+  if (d>0) return d+'d ago';
+  if (h>0) return h+'h ago';
+  if (m>0) return m+'m ago';
+  return 'just now';
+}
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) + ' ' +
+         d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function toast(msg) {
+  const t = $('#toast');
+  $('#toastMsg').textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => t.classList.add('hidden'), 2600);
+}
+function setCloud(ok, label) {
+  $('#cloudDot').classList.toggle('off', !ok);
+  $('#cloudStatus').textContent = label;
 }
 
-const SHEET_PATTERNS = {
-  yhh: ['YHH', 'STOCK', 'INVENTORY'],
-  pc:  ['STOCK', 'PC', 'SUPPLIER', 'INVENTORY'],
-  pack:['PACK', 'DISPATCH', 'SHIP'],
-  order:['ORDER', 'PO ', 'PURCHASE'],
-};
-
+// ============================================================
+// EXCEL PARSING
+// ============================================================
 const COL_PATTERNS = {
   part: [
-    /^ALT[\s.-]*PART[\s.-]*(NUMBER|NO)$/i,
-    /^PART[\s.-]*NUMBER$/i,
-    /^PART[\s.-]*NO\.?$/i,
-    /^PART[\s.-]*#$/i,
-    /^PART$/i,
-    /PART[\s.-]*N/i,
-    /^ITEM[\s.-]*(CODE|NUMBER|NO)$/i,
-    /^SKU$/i,
-    /^REFERENCE$/i,
+    /^ALT[\s.-]*PART[\s.-]*(NUMBER|NO)$/i, /^PART[\s.-]*NUMBER$/i, /^PART[\s.-]*NO\.?$/i,
+    /^PART[\s.-]*#$/i, /^PART$/i, /PART[\s.-]*N/i, /^ITEM[\s.-]*(CODE|NUMBER|NO)$/i, /^SKU$/i, /^REFERENCE$/i,
   ],
   qty: {
-    yhh:   [/^YHH$/i, /^STOCK[\s.-]*QTY$/i, /^STOCK[\s.-]*ON[\s.-]*HAND$/i, /^STOCK$/i, /^QTY$/i, /^QUANTITY$/i, /^BALANCE$/i, /^ON[\s.-]*HAND$/i, /YHH/i],
-    pc:    [/^STOCK[\s.-]*QTY$/i, /^STOCK[\s.-]*ON[\s.-]*HAND$/i, /^STOCK$/i, /^PC$/i, /^QTY$/i, /^QUANTITY$/i, /^BALANCE$/i],
-    pack:  [/^QTY$/i, /^QUANTITY$/i, /^PACKED[\s.-]*QTY$/i, /^PACKED$/i, /^DISPATCHED$/i, /^SENT[\s.-]*QTY$/i, /^BOX[\s.-]*QTY$/i],
-    order: [/^ACTUAL[\s.-]*ORDER$/i, /^ORDER[\s.-]*QTY$/i, /^ORDERED[\s.-]*QTY$/i, /^ORDER$/i, /^BALANCE$/i, /^QTY$/i, /^QUANTITY$/i, /^REQUIRED$/i],
+    yhh:[/^YHH$/i,/^STOCK[\s.-]*QTY$/i,/^STOCK[\s.-]*ON[\s.-]*HAND$/i,/^STOCK$/i,/^QTY$/i,/^QUANTITY$/i,/^BALANCE$/i,/^ON[\s.-]*HAND$/i,/YHH/i],
+    ss: [/^STOCK[\s.-]*QTY$/i,/^STOCK[\s.-]*ON[\s.-]*HAND$/i,/^STOCK$/i,/^SS$/i,/^PC$/i,/^QTY$/i,/^QUANTITY$/i,/^BALANCE$/i],
+    packing:[/^QTY$/i,/^QUANTITY$/i,/^PACKED[\s.-]*QTY$/i,/^PACKED$/i,/^DISPATCHED$/i,/^SENT[\s.-]*QTY$/i,/^BOX[\s.-]*QTY$/i],
+    order:[/^ACTUAL[\s.-]*ORDER$/i,/^ORDER[\s.-]*QTY$/i,/^ORDERED[\s.-]*QTY$/i,/^ORDER$/i,/^BALANCE$/i,/^QTY$/i,/^QUANTITY$/i,/^REQUIRED$/i],
   },
 };
+const SHEET_PATTERNS = {
+  yhh:['YHH','STOCK','INVENTORY'], ss:['STOCK','SS','PC','SUPPLIER','INVENTORY'],
+  packing:['PACK','DISPATCH','SHIP'], order:['ORDER','PURCHASE'],
+};
 
-function autoPickSheet(zoneKey, sheets) {
-  const pats = SHEET_PATTERNS[zoneKey] || [];
-  for (const pat of pats) {
-    const idx = sheets.findIndex(s => s.name.toUpperCase().includes(pat));
-    if (idx !== -1) return idx;
+async function readWorkbook(file) {
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type:'array' });
+  return wb.SheetNames.map(name => ({
+    name, rows: XLSX.utils.sheet_to_json(wb.Sheets[name], { header:1, defval:'' }),
+  }));
+}
+function autoPickSheet(kind, sheets) {
+  for (const pat of (SHEET_PATTERNS[kind]||[])) {
+    const i = sheets.findIndex(s => s.name.toUpperCase().includes(pat));
+    if (i!==-1) return i;
   }
   return 0;
 }
-
 function detectHeaderRow(rows) {
-  let best = 0, bestScore = -1;
-  for (let i = 0; i < Math.min(rows.length, 20); i++) {
-    const r = rows[i];
-    if (!r) continue;
-    let textCount = 0;
+  let best=0, bestScore=-1;
+  for (let i=0;i<Math.min(rows.length,20);i++) {
+    const r = rows[i]; if (!r) continue;
+    let tc=0;
     for (const c of r) {
       const s = String(c).trim();
-      if (s && s.length < 50 && isNaN(parseFloat(s)) && !/^\d{4}-\d{2}-\d{2}/.test(s)) textCount++;
+      if (s && s.length<50 && isNaN(parseFloat(s)) && !/^\d{4}-\d{2}-\d{2}/.test(s)) tc++;
     }
-    if (textCount > bestScore) { bestScore = textCount; best = i; }
+    if (tc>bestScore) { bestScore=tc; best=i; }
   }
   return best;
 }
-
-function columnLooksLikeParts(rows, headerRow, colIdx) {
-  let alnumCount = 0, total = 0;
-  for (let i = headerRow + 1; i < Math.min(rows.length, headerRow + 30); i++) {
-    const v = String(rows[i]?.[colIdx] ?? '').trim();
-    if (!v) continue;
-    total++;
-    if (/^[A-Z0-9-]{5,}$/i.test(v) && /[A-Z]/i.test(v) && /\d/.test(v)) alnumCount++;
+function colLooksLikeParts(rows, hr, ci) {
+  let a=0,t=0;
+  for (let i=hr+1;i<Math.min(rows.length,hr+30);i++) {
+    const v=String(rows[i]?.[ci]??'').trim(); if(!v) continue; t++;
+    if (/^[A-Z0-9-]{5,}$/i.test(v) && /[A-Z]/i.test(v) && /\d/.test(v)) a++;
   }
-  return total > 0 && alnumCount / total > 0.7;
+  return t>0 && a/t>0.7;
 }
-
-function columnLooksLikeQty(rows, headerRow, colIdx) {
-  let numCount = 0, total = 0;
-  for (let i = headerRow + 1; i < Math.min(rows.length, headerRow + 30); i++) {
-    const v = rows[i]?.[colIdx];
-    if (v === '' || v === null || v === undefined) continue;
-    total++;
-    if (typeof v === 'number' || (!isNaN(parseFloat(v)) && /^-?[\d.,]+$/.test(String(v).trim()))) numCount++;
+function colLooksLikeQty(rows, hr, ci) {
+  let n=0,t=0;
+  for (let i=hr+1;i<Math.min(rows.length,hr+30);i++) {
+    const v=rows[i]?.[ci]; if(v===''||v==null) continue; t++;
+    if (typeof v==='number' || (!isNaN(parseFloat(v)) && /^-?[\d.,]+$/.test(String(v).trim()))) n++;
   }
-  return total > 0 && numCount / total > 0.8;
+  return t>0 && n/t>0.8;
 }
-
-function detectColumns(zoneKey, rows) {
-  const z = state.zones[zoneKey];
-  z.headerRow = detectHeaderRow(rows);
-  const hdr = (rows[z.headerRow] || []).map(c => String(c).trim());
-
-  let partIdx = -1;
+function detectColumns(kind, rows) {
+  const hr = detectHeaderRow(rows);
+  const hdr = (rows[hr]||[]).map(c=>String(c).trim());
+  let part=-1;
   for (const pat of COL_PATTERNS.part) {
-    for (let i = 0; i < hdr.length; i++) {
-      if (pat.test(hdr[i])) { partIdx = i; break; }
-    }
-    if (partIdx !== -1) break;
+    for (let i=0;i<hdr.length;i++) if (pat.test(hdr[i])) { part=i; break; }
+    if (part!==-1) break;
   }
-
-  const qtyPats = COL_PATTERNS.qty[zoneKey] || COL_PATTERNS.qty.order;
-  let qtyIdx = -1;
-  for (const pat of qtyPats) {
-    for (let i = 0; i < hdr.length; i++) {
-      if (i === partIdx) continue;
-      if (pat.test(hdr[i])) { qtyIdx = i; break; }
-    }
-    if (qtyIdx !== -1) break;
+  const qp = COL_PATTERNS.qty[kind] || COL_PATTERNS.qty.order;
+  let qty=-1;
+  for (const pat of qp) {
+    for (let i=0;i<hdr.length;i++) { if (i===part) continue; if (pat.test(hdr[i])) { qty=i; break; } }
+    if (qty!==-1) break;
   }
-
-  if (partIdx === -1) {
-    for (let i = 0; i < hdr.length; i++) {
-      if (columnLooksLikeParts(rows, z.headerRow, i)) { partIdx = i; break; }
+  if (part===-1) for (let i=0;i<hdr.length;i++) if (colLooksLikeParts(rows,hr,i)) { part=i; break; }
+  if (qty===-1)  for (let i=0;i<hdr.length;i++) { if(i===part) continue; if (colLooksLikeQty(rows,hr,i)) { qty=i; break; } }
+  let desc=-1;
+  for (let i=0;i<hdr.length;i++) if (/^DESC/i.test(hdr[i])) { desc=i; break; }
+  return { headerRow:hr, partCol:part, qtyCol:qty, descCol:desc };
+}
+function colLabel(sheet, hr, ci) {
+  const h = String(sheet.rows[hr]?.[ci]??'').trim();
+  const samp=[];
+  for (let r=hr+1;r<Math.min(sheet.rows.length,hr+4);r++) {
+    const v=sheet.rows[r]?.[ci];
+    if (v!==''&&v!=null) samp.push(String(v).slice(0,14));
+    if (samp.length>=2) break;
+  }
+  return (h?h.slice(0,16):`Col ${ci+1}`) + (samp.length?` · ${samp.join(', ').slice(0,28)}`:'');
+}
+function parseRows(sheet, m) {
+  const list=[], map={};
+  for (let i=m.headerRow+1;i<sheet.rows.length;i++) {
+    const r=sheet.rows[i]; if(!r) continue;
+    const p=norm(r[m.partCol]); const q=toNum(r[m.qtyCol]);
+    if (p && q>0) {
+      const d = m.descCol>=0 ? String(r[m.descCol]||'').trim() : '';
+      list.push({ partNo:p, qty:q, desc:d });
+      map[p] = (map[p]||0) + q;
     }
   }
-  if (qtyIdx === -1) {
-    for (let i = 0; i < hdr.length; i++) {
-      if (i === partIdx) continue;
-      if (columnLooksLikeQty(rows, z.headerRow, i)) { qtyIdx = i; break; }
-    }
-  }
-
-  z.partCol = partIdx;
-  z.qtyCol = qtyIdx;
-
-  if (zoneKey === 'order') {
-    let descIdx = -1;
-    for (let i = 0; i < hdr.length; i++) {
-      if (/^DESC/i.test(hdr[i])) { descIdx = i; break; }
-    }
-    z.descCol = descIdx;
-  }
+  return { list, map };
 }
 
-function parseZone(zoneKey) {
-  const z = state.zones[zoneKey];
-  if (z.fileIdx === -1 || z.sheetIdx === -1 || z.partCol === -1 || z.qtyCol === -1) {
-    if (zoneKey === 'order') z.list = []; else z.map = new Map();
-    return;
+// ============================================================
+// CLOUD
+// ============================================================
+async function loadStock() {
+  const { data, error } = await sb.from('ob_stock').select('*');
+  if (error) { setCloud(false,'Offline'); return; }
+  state.stock.yhh = null; state.stock.ss = null;
+  for (const row of (data||[])) {
+    state.stock[row.stock_type] = {
+      map: row.data || {},
+      count: row.part_count || 0,
+      updatedAt: row.updated_at,
+      source: row.source_label || '',
+    };
   }
-  const sheet = state.files[z.fileIdx].sheets[z.sheetIdx];
+  renderStockStrip();
+}
+async function saveStock(kind, map, count, sourceLabel) {
+  const { error } = await sb.from('ob_stock').upsert({
+    stock_type: kind, data: map, part_count: count,
+    source_label: sourceLabel, updated_at: new Date().toISOString(),
+  });
+  if (error) { toast('Stock save failed: '+error.message); return false; }
+  state.stock[kind] = { map, count, updatedAt:new Date().toISOString(), source:sourceLabel };
+  renderStockStrip();
+  if (state.active) refreshReport();
+  return true;
+}
+async function loadInvoices() {
+  const { data, error } = await sb.from('ob_orders')
+    .select('invoice_no,party_name,total_qty,line_count,created_at,updated_at')
+    .order('updated_at',{ascending:false});
+  if (error) { setCloud(false,'Offline'); return; }
+  state.invoices = data || [];
+}
+async function saveOrder(invoiceNo, party, note, lines) {
+  const total = lines.reduce((a,b)=>a+b.orderQty,0);
+  const { error } = await sb.from('ob_orders').upsert({
+    invoice_no: invoiceNo, party_name: party||null, note: note||null,
+    lines, total_qty: total, line_count: lines.length,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) { toast('Order save failed: '+error.message); return false; }
+  await loadInvoices();
+  return true;
+}
+async function openInvoice(invoiceNo) {
+  const { data: order, error: e1 } = await sb.from('ob_orders').select('*').eq('invoice_no',invoiceNo).single();
+  if (e1) { toast('Could not open invoice'); return; }
+  const { data: slips } = await sb.from('ob_packing_slips').select('*').eq('invoice_no',invoiceNo).order('uploaded_at',{ascending:true});
+  state.active = {
+    invoiceNo: order.invoice_no,
+    partyName: order.party_name || '',
+    note: order.note || '',
+    orderLines: (order.lines||[]).map(l => ({ partNo:l.partNo, orderQty:l.orderQty, desc:l.desc||'' })),
+    slips: (slips||[]).map(s => ({ id:s.id, label:s.slip_label, lines:s.lines||[], lineCount:s.line_count, totalQty:s.total_qty, uploadedAt:s.uploaded_at })),
+  };
+  subscribeRealtime(invoiceNo);
+  refreshReport();
+  renderWorkspace();
+}
+function closeInvoice() {
+  state.active = null;
+  state.report = null;
+  unsubscribeRealtime();
+  $('#reportSection').classList.add('hidden');
+  renderWorkspace();
+  renderKPI();
+}
+async function addSlip(label, lines) {
+  if (!state.active) return false;
+  const total = lines.reduce((a,b)=>a+b.qty,0);
+  const { data, error } = await sb.from('ob_packing_slips').insert({
+    invoice_no: state.active.invoiceNo, slip_label: label||'Packing slip',
+    lines, line_count: lines.length, total_qty: total,
+  }).select().single();
+  if (error) { toast('Slip add failed: '+error.message); return false; }
+  state.active.slips.push({ id:data.id, label:data.slip_label, lines:data.lines, lineCount:data.line_count, totalQty:data.total_qty, uploadedAt:data.uploaded_at });
+  refreshReport();
+  renderWorkspace();
+  return true;
+}
+async function deleteSlip(id) {
+  if (!confirm('Remove this packing slip from the invoice?')) return;
+  const { error } = await sb.from('ob_packing_slips').delete().eq('id',id);
+  if (error) { toast('Delete failed'); return; }
+  state.active.slips = state.active.slips.filter(s => s.id!==id);
+  refreshReport();
+  renderWorkspace();
+  toast('Packing slip removed');
+}
+async function deleteInvoice(invoiceNo) {
+  if (!confirm(`Delete invoice ${invoiceNo} and all its packing slips? This cannot be undone.`)) return;
+  const { error } = await sb.from('ob_orders').delete().eq('invoice_no',invoiceNo);
+  if (error) { toast('Delete failed'); return; }
+  if (state.active && state.active.invoiceNo===invoiceNo) closeInvoice();
+  await loadInvoices();
+  renderWorkspace();
+  toast('Invoice deleted');
+}
 
-  if (zoneKey === 'order') {
-    z.list = [];
-    for (let i = z.headerRow + 1; i < sheet.rows.length; i++) {
-      const r = sheet.rows[i];
-      if (!r) continue;
-      const p = norm(r[z.partCol]);
-      const q = toNum(r[z.qtyCol]);
-      if (p && q > 0) {
-        const desc = z.descCol >= 0 ? String(r[z.descCol] || '').trim() : '';
-        z.list.push({ partNo: p, orderQty: q, desc });
+// ============================================================
+// REALTIME — auto-update when slips change from another device
+// ============================================================
+function subscribeRealtime(invoiceNo) {
+  unsubscribeRealtime();
+  state.realtimeChan = sb.channel('slips-'+invoiceNo)
+    .on('postgres_changes',
+      { event:'*', schema:'public', table:'ob_packing_slips', filter:'invoice_no=eq.'+invoiceNo },
+      async () => {
+        const { data: slips } = await sb.from('ob_packing_slips').select('*').eq('invoice_no',invoiceNo).order('uploaded_at',{ascending:true});
+        if (state.active && state.active.invoiceNo===invoiceNo) {
+          state.active.slips = (slips||[]).map(s => ({ id:s.id, label:s.slip_label, lines:s.lines||[], lineCount:s.line_count, totalQty:s.total_qty, uploadedAt:s.uploaded_at }));
+          refreshReport();
+          renderWorkspace();
+        }
+      })
+    .subscribe();
+}
+function unsubscribeRealtime() {
+  if (state.realtimeChan) { sb.removeChannel(state.realtimeChan); state.realtimeChan = null; }
+}
+
+// ============================================================
+// ALGORITHM
+// ============================================================
+function refreshReport() {
+  if (!state.active) { state.report = null; return; }
+  const yhh = state.stock.yhh ? state.stock.yhh.map : {};
+  const ss  = state.stock.ss  ? state.stock.ss.map  : {};
+
+  // Cumulative packed across all slips
+  const packedMap = {};
+  for (const slip of state.active.slips) {
+    for (const ln of slip.lines) {
+      packedMap[ln.partNo] = (packedMap[ln.partNo]||0) + ln.qty;
+    }
+  }
+
+  const done=[], fromYHH=[], pbo=[], shortfall=[], overview=[];
+  for (const o of state.active.orderLines) {
+    const packed = packedMap[o.partNo] || 0;
+    const y = yhh[o.partNo] || 0;
+    const s = ss[o.partNo] || 0;
+    const remaining = Math.max(0, o.orderQty - packed);
+    const base = { partNo:o.partNo, desc:o.desc, orderQty:o.orderQty, packed, yhh:y, ss:s, remaining };
+    let useYhh=0, usePbo=0, stillShort=0;
+    if (remaining===0) {
+      done.push({...base});
+    } else {
+      useYhh = Math.min(y, remaining);
+      if (useYhh>0) fromYHH.push({...base, packFromYhh:useYhh});
+      const afterYhh = remaining - useYhh;
+      if (afterYhh>0) {
+        usePbo = Math.min(afterYhh, s);
+        if (usePbo>0) pbo.push({...base, packFromYhh:useYhh, pboQty:usePbo, ssAvail:s});
+        stillShort = afterYhh - usePbo;
+        if (stillShort>0) shortfall.push({...base, packFromYhh:useYhh, pboQty:usePbo, shortQty:stillShort});
       }
     }
-  } else {
-    z.map = new Map();
-    for (let i = z.headerRow + 1; i < sheet.rows.length; i++) {
-      const r = sheet.rows[i];
-      if (!r) continue;
-      const p = norm(r[z.partCol]);
-      const q = toNum(r[z.qtyCol]);
-      if (p && q > 0) z.map.set(p, (z.map.get(p) || 0) + q);
-    }
+    let status, color;
+    if (remaining===0) { status='Packed'; color='mint'; }
+    else if (stillShort===0 && usePbo===0) { status='YHH ready'; color='lav'; }
+    else if (stillShort===0) { status='PBO needed'; color='peach'; }
+    else { status='Shortfall'; color='ink'; }
+    overview.push({...base, useYhh, usePbo, stillShort, status, color});
   }
+  state.report = { overview, done, fromYHH, pbo, shortfall, packedMap };
+  renderReport();
+  renderKPI();
 }
 
-function parsePastedOrder() {
-  const z = state.zones.order;
-  const text = (z.pasted || '').trim();
-  if (!text) { z.list = []; return; }
-  const lines = text.split('\n');
-  z.list = [];
-  for (const line of lines) {
-    const parts = line.split(/\t|,|\s{2,}/).map(s => s.trim()).filter(Boolean);
-    if (parts.length < 2) continue;
-    const p = norm(parts[0]);
-    const q = toNum(parts[parts.length - 1]);
-    if (p && q > 0 && !['PART','PARTNO','PARTNUMBER'].includes(p)) {
-      z.list.push({ partNo: p, orderQty: q, desc: '' });
-    }
-  }
+// ============================================================
+// MODAL — upload + column mapping
+// ============================================================
+let modalCtx = null;  // { kind, sheets, sheetIdx, map, fileName }
+
+function openModal(kind) {
+  modalCtx = { kind, sheets:null, sheetIdx:0, map:null, fileName:'', invoiceNo:'', party:'', note:'' };
+  $('#modal').classList.remove('hidden');
+  renderModal();
 }
-
-function getColLabel(hdr, sheet, headerRow, colIdx) {
-  const h = (hdr[colIdx] || '').trim();
-  const samples = [];
-  for (let r = headerRow + 1; r < Math.min(sheet.rows.length, headerRow + 4); r++) {
-    const v = sheet.rows[r]?.[colIdx];
-    if (v !== '' && v !== null && v !== undefined) samples.push(String(v).slice(0, 14));
-    if (samples.length >= 2) break;
-  }
-  const base = h ? h.slice(0, 16) : `Col ${colIdx + 1}`;
-  const sampleStr = samples.length ? ` · ${samples.join(', ').slice(0, 30)}` : '';
-  return base + sampleStr;
+function closeModal() {
+  $('#modal').classList.add('hidden');
+  modalCtx = null;
 }
+const KIND_META = {
+  yhh:    { title:'Update YHH Stock',  hint:'Our warehouse stock', icon:'📦' },
+  ss:     { title:'Update SS Stock',   hint:'Super stockist stock', icon:'🏭' },
+  order:  { title:'New Invoice / Order', hint:'The order to fulfill', icon:'📝' },
+  packing:{ title:'Add Packing Slip',  hint:'Material packed & sent', icon:'📋' },
+};
 
-function renderZone(zoneKey) {
-  const z = state.zones[zoneKey];
-  const card = document.querySelector(`.zone-card[data-zone="${zoneKey}"]`);
-  const hasFile = z.fileIdx !== -1;
-  const file = hasFile ? state.files[z.fileIdx] : null;
-  const sheet = (hasFile && z.sheetIdx >= 0) ? file.sheets[z.sheetIdx] : null;
-  const hdrCells = sheet ? (sheet.rows[z.headerRow] || []).map(c => String(c).trim()) : [];
-  const count = zoneKey === 'order' ? z.list.length : z.map.size;
+function renderModal() {
+  const c = modalCtx;
+  const meta = KIND_META[c.kind];
+  const card = $('#modalCard');
+  let body = '';
 
-  let html = `
-    <div class="flex items-start justify-between mb-4">
-      <div>
-        <div class="text-[10px] uppercase tracking-[0.18em] text-ink-mute font-mono">${z.idx} · ${z.label}${z.optional ? ' <span class="text-ink-faint normal-case tracking-normal">(optional)</span>' : ''}</div>
-        <div class="text-base font-medium tracking-tight mt-1">${z.sub}</div>
+  // Header
+  body += `
+    <div class="flex items-start justify-between p-5 sm:p-6 border-b border-cream-deep">
+      <div class="flex items-center gap-3">
+        <div class="text-2xl">${meta.icon}</div>
+        <div>
+          <div class="text-lg font-medium tracking-tight">${meta.title}</div>
+          <div class="text-xs text-ink-mute font-mono">${meta.hint}</div>
+        </div>
       </div>
-      <div class="text-2xl leading-none">${z.icon}</div>
+      <button onclick="closeModal()" class="text-ink-faint hover:text-ink text-xl leading-none">&times;</button>
     </div>
   `;
 
-  if (!hasFile) {
-    html += `
-      <label class="zone-drop block border-2 border-dashed border-cream-deep rounded-xl p-6 text-center cursor-pointer hover:border-lav-300 hover:bg-cream-dark/30 transition" data-zone="${zoneKey}">
-        <input type="file" accept=".xlsx,.xls" class="hidden" onchange="handleFileInput(event, '${zoneKey}')" />
-        <div class="text-[11px] uppercase tracking-wider text-ink-mute font-mono mb-1">Drop or tap</div>
-        <div class="text-xs text-ink-faint">.xlsx · .xls</div>
+  body += `<div class="p-5 sm:p-6 space-y-4">`;
+
+  // Order/packing extra fields
+  if (c.kind === 'order') {
+    body += `
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Invoice number *</div>
+          <input id="mInvoice" value="${esc(c.invoiceNo)}" oninput="modalCtx.invoiceNo=this.value"
+            class="w-full px-3 py-2.5 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition font-mono text-sm"
+            placeholder="INV-2026-001" autocomplete="off" autocorrect="off" spellcheck="false" />
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Party / customer</div>
+          <input id="mParty" value="${esc(c.party)}" oninput="modalCtx.party=this.value"
+            class="w-full px-3 py-2.5 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition text-sm"
+            placeholder="Optional" autocomplete="off" />
+        </div>
+      </div>
+    `;
+  }
+  if (c.kind === 'packing') {
+    body += `
+      <div>
+        <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Slip label</div>
+        <input id="mLabel" value="${esc(c.fileName||'')}" oninput="modalCtx.fileName=this.value"
+          class="w-full px-3 py-2.5 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition text-sm"
+          placeholder="e.g. Box 1-5 / 21-Apr dispatch" autocomplete="off" />
+        <div class="text-[11px] text-ink-faint font-mono mt-1.5">Attaching to invoice ${state.active ? '<b>'+esc(state.active.invoiceNo)+'</b>' : ''}</div>
+      </div>
+    `;
+  }
+
+  // File area
+  if (!c.sheets) {
+    body += `
+      <label class="modal-drop block border-2 border-dashed border-cream-deep rounded-xl p-8 text-center cursor-pointer hover:border-lav-300 hover:bg-cream-dark/30 transition">
+        <input type="file" accept=".xlsx,.xls" class="hidden" onchange="modalFile(event)" />
+        <div class="text-3xl mb-2 opacity-50">⬆</div>
+        <div class="text-sm font-medium">Drop or tap to pick file</div>
+        <div class="text-[11px] text-ink-faint font-mono mt-1">.xlsx · .xls</div>
       </label>
     `;
-    if (zoneKey === 'order') {
-      html += `
-        <div class="mt-3">
-          <div class="text-[10px] uppercase tracking-wider text-ink-mute font-medium mb-1.5">Or paste</div>
-          <textarea
-            class="w-full px-3 py-2.5 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition text-xs font-mono leading-relaxed resize-none"
-            rows="4"
-            placeholder="PART NO&#9;QTY&#10;52400ABZ000S&#9;30"
-            oninput="onOrderPaste(this.value)"
-            autocomplete="off" autocorrect="off" spellcheck="false"
-          >${z.pasted}</textarea>
-          <div id="orderPasteCount" class="mt-2 inline-flex items-center gap-2 px-2.5 py-1 bg-mint-300 rounded-full text-[11px] font-medium" style="${count > 0 ? '' : 'display:none'}">
-            ✓ ${count} lines parsed
-          </div>
+  } else {
+    const sheet = c.sheets[c.sheetIdx];
+    const hdr = (sheet.rows[c.map.headerRow]||[]).map(x=>String(x).trim());
+    body += `
+      <div class="flex items-center justify-between text-xs">
+        <span class="font-mono text-ink-mute truncate">${esc(c.fileName)}</span>
+        <button onclick="modalCtx.sheets=null;renderModal()" class="text-ink-faint hover:text-ink underline text-[10px] uppercase tracking-wider font-mono">Change file</button>
+      </div>
+    `;
+    if (c.sheets.length > 1) {
+      body += `
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Sheet</div>
+          <select onchange="modalSheet(parseInt(this.value))" class="w-full px-3 py-2 rounded-lg border border-cream-deep bg-cream/40 text-sm font-mono focus:bg-white focus:outline-none">
+            ${c.sheets.map((s,i)=>`<option value="${i}" ${i===c.sheetIdx?'selected':''}>${esc(s.name.trim())}</option>`).join('')}
+          </select>
         </div>
       `;
     }
-    card.innerHTML = html;
-    bindDrop(card, zoneKey);
-    return;
-  }
-
-  html += `
-    <div class="flex items-center justify-between mb-3 text-xs gap-2">
-      <span class="text-ink-mute font-mono truncate flex-1">${file.name}</span>
-      <button onclick="resetZone('${zoneKey}')" class="text-ink-faint hover:text-ink underline text-[10px] uppercase tracking-wider font-mono shrink-0">Replace</button>
-    </div>
-  `;
-  if (file.sheets.length > 1) {
-    html += `
-      <div class="mb-2.5">
-        <div class="text-[10px] uppercase tracking-wider text-ink-mute font-medium mb-1">Sheet</div>
-        <select onchange="setZoneSheet('${zoneKey}', parseInt(this.value))" class="w-full px-3 py-2 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition text-xs font-mono">
-          ${file.sheets.map((s, i) => `<option value="${i}" ${i === z.sheetIdx ? 'selected' : ''}>${s.name.trim()}</option>`).join('')}
-        </select>
-      </div>
-    `;
-  }
-  html += `
-    <div class="grid grid-cols-2 gap-2 mb-3">
-      <div>
-        <div class="text-[10px] uppercase tracking-wider text-ink-mute font-medium mb-1">Part column</div>
-        <select onchange="setZoneCol('${zoneKey}', 'partCol', parseInt(this.value))" class="w-full px-2.5 py-2 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition text-[11px] font-mono">
-          <option value="-1" ${z.partCol === -1 ? 'selected' : ''}>— pick —</option>
-          ${hdrCells.map((h, i) => `<option value="${i}" ${i === z.partCol ? 'selected' : ''}>${getColLabel(hdrCells, sheet, z.headerRow, i)}</option>`).join('')}
-        </select>
-      </div>
-      <div>
-        <div class="text-[10px] uppercase tracking-wider text-ink-mute font-medium mb-1">Qty column</div>
-        <select onchange="setZoneCol('${zoneKey}', 'qtyCol', parseInt(this.value))" class="w-full px-2.5 py-2 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition text-[11px] font-mono">
-          <option value="-1" ${z.qtyCol === -1 ? 'selected' : ''}>— pick —</option>
-          ${hdrCells.map((h, i) => `<option value="${i}" ${i === z.qtyCol ? 'selected' : ''}>${getColLabel(hdrCells, sheet, z.headerRow, i)}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-  `;
-  if (count > 0) {
-    const items = zoneKey === 'order'
-      ? z.list.slice(0, 3)
-      : Array.from(z.map.entries()).slice(0, 3).map(([k, v]) => ({ partNo: k, orderQty: v }));
-    html += `
-      <div class="bg-cream-dark/40 rounded-lg p-2.5 mb-3">
-        <div class="text-[10px] uppercase tracking-wider text-ink-mute font-medium mb-1.5">Preview</div>
-        <div class="space-y-0.5">
-          ${items.map(item => `<div class="flex justify-between text-[11px] font-mono"><span class="truncate mr-2">${item.partNo}</span><span class="text-ink-mute shrink-0">${item.orderQty}</span></div>`).join('')}
+    body += `
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Part column</div>
+          <select onchange="modalCtx.map.partCol=parseInt(this.value);renderModal()" class="w-full px-2.5 py-2 rounded-lg border border-cream-deep bg-cream/40 text-[11px] font-mono focus:bg-white focus:outline-none">
+            <option value="-1" ${c.map.partCol===-1?'selected':''}>— pick —</option>
+            ${hdr.map((h,i)=>`<option value="${i}" ${i===c.map.partCol?'selected':''}>${esc(colLabel(sheet,c.map.headerRow,i))}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Qty column</div>
+          <select onchange="modalCtx.map.qtyCol=parseInt(this.value);renderModal()" class="w-full px-2.5 py-2 rounded-lg border border-cream-deep bg-cream/40 text-[11px] font-mono focus:bg-white focus:outline-none">
+            <option value="-1" ${c.map.qtyCol===-1?'selected':''}>— pick —</option>
+            ${hdr.map((h,i)=>`<option value="${i}" ${i===c.map.qtyCol?'selected':''}>${esc(colLabel(sheet,c.map.headerRow,i))}</option>`).join('')}
+          </select>
         </div>
       </div>
-      <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-mint-300 rounded-full text-[11px] font-medium">
-        ✓ ${count.toLocaleString()} ${zoneKey === 'order' ? 'lines' : 'parts'}
-      </div>
     `;
-  } else {
-    html += `<div class="text-[11px] text-ink bg-peach-100 rounded-lg px-3 py-2 font-medium">No data parsed — check column selections</div>`;
-  }
-  card.innerHTML = html;
-}
-
-function onOrderPaste(text) {
-  state.zones.order.pasted = text;
-  parsePastedOrder();
-  updateKPI();
-  const badge = document.getElementById('orderPasteCount');
-  const count = state.zones.order.list.length;
-  if (badge) {
-    if (count > 0) { badge.style.display = 'inline-flex'; badge.textContent = `✓ ${count} lines parsed`; }
-    else badge.style.display = 'none';
-  }
-}
-
-function bindDrop(card, zoneKey) {
-  const dropZone = card.querySelector('.zone-drop');
-  if (!dropZone) return;
-  ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); dropZone.classList.add('drag-over'); }));
-  ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); dropZone.classList.remove('drag-over'); }));
-  dropZone.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) processFileForZone(f, zoneKey); });
-}
-
-async function handleFileInput(event, zoneKey) {
-  const f = event.target.files[0];
-  if (f) await processFileForZone(f, zoneKey);
-}
-
-async function processFileForZone(file, zoneKey) {
-  try {
-    const fileIdx = await ingestFile(file);
-    const z = state.zones[zoneKey];
-    z.fileIdx = fileIdx;
-    z.sheetIdx = autoPickSheet(zoneKey, state.files[fileIdx].sheets);
-    const rows = state.files[fileIdx].sheets[z.sheetIdx].rows;
-    detectColumns(zoneKey, rows);
-    parseZone(zoneKey);
-    renderZone(zoneKey);
-    renderFileRegistry();
-    updateKPI();
-  } catch (err) { alert('Could not read file: ' + err.message); }
-}
-
-function setZoneSheet(zoneKey, sheetIdx) {
-  const z = state.zones[zoneKey];
-  z.sheetIdx = sheetIdx;
-  const rows = state.files[z.fileIdx].sheets[sheetIdx].rows;
-  detectColumns(zoneKey, rows);
-  parseZone(zoneKey);
-  renderZone(zoneKey);
-  updateKPI();
-}
-
-function setZoneCol(zoneKey, field, idx) {
-  state.zones[zoneKey][field] = idx;
-  parseZone(zoneKey);
-  renderZone(zoneKey);
-  updateKPI();
-}
-
-function resetZone(zoneKey) {
-  const z = state.zones[zoneKey];
-  z.fileIdx = -1; z.sheetIdx = -1; z.headerRow = 0; z.partCol = -1; z.qtyCol = -1;
-  if (zoneKey === 'order') { z.list = []; z.pasted = ''; z.descCol = -1; } else z.map = new Map();
-  renderZone(zoneKey);
-  renderFileRegistry();
-  updateKPI();
-}
-
-function resetAll() {
-  if (!confirm('Reset all uploads and clear data?')) return;
-  state.files = [];
-  for (const k of Object.keys(state.zones)) resetZone(k);
-  state.report = null;
-  $('#resultsSection').classList.add('hidden');
-  $('#fileRegistry').classList.add('hidden');
-  updateKPI();
-}
-
-function renderFileRegistry() {
-  const reg = $('#fileRegistry');
-  if (state.files.length === 0) { reg.classList.add('hidden'); return; }
-  reg.classList.remove('hidden');
-  $('#fileRegistryList').innerHTML = state.files.map((f, i) => {
-    const usedBy = Object.entries(state.zones).filter(([k, z]) => z.fileIdx === i).map(([k]) => k.toUpperCase());
-    return `<div class="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-cream-deep text-[11px] font-mono">
-      <span>📎</span><span>${f.name}</span>
-      ${usedBy.length > 0 ? `<span class="text-ink-faint">→ ${usedBy.join(' · ')}</span>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function updateKPI() {
-  const z = state.zones;
-  $('#kpiFiles').textContent = state.files.length;
-  $('#kpiStock').textContent = (z.yhh.map.size + z.pc.map.size).toLocaleString();
-  $('#kpiOrders').textContent = z.order.list.length;
-  $('#kpiOrderSub').textContent = z.order.list.length > 0 ? 'Ready to analyze' : 'Awaiting input';
-
-  const ready = z.yhh.map.size > 0 && z.pc.map.size > 0 && z.order.list.length > 0;
-  const btn = $('#generateBtn');
-  btn.disabled = !ready;
-  btn.classList.toggle('opacity-40', !ready);
-  btn.classList.toggle('cursor-not-allowed', !ready);
-
-  const missing = [];
-  if (!z.yhh.map.size) missing.push('YHH');
-  if (!z.pc.map.size) missing.push('PC');
-  if (!z.order.list.length) missing.push('Order');
-  $('#generateStatus').textContent = missing.length
-    ? `Need: ${missing.join(' · ')}`
-    : `Ready · ${z.order.list.length} order lines · YHH ${z.yhh.map.size.toLocaleString()} · PC ${z.pc.map.size.toLocaleString()} · Packed ${z.pack.map.size.toLocaleString()}`;
-}
-
-// === ALGORITHM ===
-function generateReport() {
-  const z = state.zones;
-  if (!z.yhh.map.size || !z.pc.map.size || !z.order.list.length) {
-    alert('Need YHH stock, PC stock, and order at minimum.');
-    return;
-  }
-  const done = [], fromYHH = [], pbo = [], shortfall = [], overview = [];
-  for (const o of z.order.list) {
-    const packed = z.pack.map.get(o.partNo) || 0;
-    const yhh = z.yhh.map.get(o.partNo) || 0;
-    const pc = z.pc.map.get(o.partNo) || 0;
-    const remaining = Math.max(0, o.orderQty - packed);
-    const base = { partNo: o.partNo, desc: o.desc, orderQty: o.orderQty, packed, yhh, pc, remaining };
-    let useYhh = 0, usePbo = 0, stillShort = 0;
-    if (remaining === 0) {
-      done.push({ ...base });
+    // Preview
+    const parsed = (c.map.partCol>=0 && c.map.qtyCol>=0) ? parseRows(sheet, c.map) : { list:[], map:{} };
+    c._parsed = parsed;
+    if (parsed.list.length>0) {
+      body += `
+        <div class="bg-cream-dark/50 rounded-lg p-3">
+          <div class="text-[10px] uppercase tracking-wider text-ink-mute font-medium mb-1.5">Preview · ${parsed.list.length.toLocaleString()} rows</div>
+          <div class="space-y-0.5">
+            ${parsed.list.slice(0,4).map(x=>`<div class="flex justify-between text-[11px] font-mono"><span class="truncate mr-2">${esc(x.partNo)}</span><span class="text-ink-mute">${x.qty}</span></div>`).join('')}
+          </div>
+        </div>
+      `;
     } else {
-      useYhh = Math.min(yhh, remaining);
-      if (useYhh > 0) fromYHH.push({ ...base, packFromYhh: useYhh });
-      const afterYhh = remaining - useYhh;
-      if (afterYhh > 0) {
-        usePbo = Math.min(afterYhh, pc);
-        if (usePbo > 0) pbo.push({ ...base, packFromYhh: useYhh, pboQty: usePbo, pcAvail: pc });
-        stillShort = afterYhh - usePbo;
-        if (stillShort > 0) shortfall.push({ ...base, packFromYhh: useYhh, pboQty: usePbo, shortQty: stillShort });
-      }
+      body += `<div class="text-[11px] text-ink bg-peach-100 rounded-lg px-3 py-2 font-medium">No data parsed — check column selection</div>`;
     }
-    let status, statusColor;
-    if (remaining === 0) { status = 'Packed'; statusColor = 'mint'; }
-    else if (stillShort === 0 && usePbo === 0) { status = 'YHH ready'; statusColor = 'lav'; }
-    else if (stillShort === 0) { status = 'PBO needed'; statusColor = 'peach'; }
-    else { status = 'Shortfall'; statusColor = 'ink'; }
-    overview.push({ ...base, useYhh, usePbo, stillShort, status, statusColor });
   }
-  state.report = { overview, done, fromYHH, pbo, shortfall };
 
-  $('#tabCountPacked').textContent = done.length;
-  $('#tabCountYHH').textContent = fromYHH.length;
-  $('#tabCountPBO').textContent = pbo.length;
-  $('#tabCountShort').textContent = shortfall.length;
-  $('#kpiPBO').textContent = pbo.reduce((a, b) => a + b.pboQty, 0).toLocaleString();
+  body += `</div>`;
 
-  $('#resultsSection').classList.remove('hidden');
-  showTab('overview');
-  setTimeout(() => $('#resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-}
-
-// === RESULTS UI ===
-function showTab(name) {
-  $$('.tab-btn').forEach(b => {
-    const active = b.dataset.tab === name;
-    b.classList.toggle('bg-ink', active);
-    b.classList.toggle('text-cream', active);
-    b.classList.toggle('text-ink-mute', !active);
-  });
-  const r = state.report;
-  if (!r) return;
-  const el = $('#resultsContent');
-  if (name === 'overview') el.innerHTML = renderOverview();
-  else if (name === 'packed') el.innerHTML = renderPacked();
-  else if (name === 'yhh') el.innerHTML = renderYhhPick();
-  else if (name === 'pbo') el.innerHTML = renderPbo();
-  else if (name === 'short') el.innerHTML = renderShortfall();
-}
-
-function badge(text, color) {
-  const colors = {
-    mint: 'bg-mint-300 text-ink',
-    lav: 'bg-lav-100 text-lav-700',
-    peach: 'bg-peach-100 text-ink',
-    ink: 'bg-ink text-cream',
-  };
-  return `<span class="inline-block px-2 py-0.5 ${colors[color]||'bg-cream-dark text-ink-mute'} rounded-full text-[10px] font-medium uppercase tracking-wider">${text}</span>`;
-}
-
-function stat(label, value, color) {
-  const colors = { ink:'text-ink', mint:'text-mint-500', lav:'text-lav-700', peach:'text-peach-500', red:'text-ink' };
-  return `
-    <div>
-      <div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono mb-1.5">${label}</div>
-      <div class="text-2xl sm:text-3xl font-medium tracking-tight ${colors[color]}">${(value||0).toLocaleString()}</div>
+  // Footer
+  const canSave = c.sheets && c._parsed && c._parsed.list.length>0 &&
+                  (c.kind!=='order' || (c.invoiceNo||'').trim().length>0);
+  body += `
+    <div class="flex items-center justify-end gap-2 p-5 sm:p-6 border-t border-cream-deep">
+      <button onclick="closeModal()" class="bg-cream/60 border border-cream-deep rounded-full px-5 py-2.5 text-sm font-medium hover:bg-cream-dark transition">Cancel</button>
+      <button id="mSave" ${canSave?'':'disabled'} onclick="modalSave()"
+        class="bg-ink text-cream rounded-full px-5 py-2.5 text-sm font-medium hover:bg-ink-soft transition ${canSave?'':'opacity-40 cursor-not-allowed'}">
+        Save to cloud
+      </button>
     </div>
   `;
+
+  card.innerHTML = body;
+
+  // bind drag-drop
+  const drop = card.querySelector('.modal-drop');
+  if (drop) {
+    ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();drop.classList.add('drag-over');}));
+    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();drop.classList.remove('drag-over');}));
+    drop.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) modalFileObj(f); });
+  }
 }
 
+async function modalFile(ev) {
+  const f = ev.target.files[0];
+  if (f) await modalFileObj(f);
+}
+async function modalFileObj(file) {
+  try {
+    const sheets = await readWorkbook(file);
+    modalCtx.fileName = file.name;
+    modalCtx.sheets = sheets;
+    modalCtx.sheetIdx = autoPickSheet(modalCtx.kind, sheets);
+    modalCtx.map = detectColumns(modalCtx.kind, sheets[modalCtx.sheetIdx].rows);
+    if (modalCtx.kind==='packing' && !$('#mLabel')) modalCtx.fileName = file.name;
+    renderModal();
+  } catch (err) { toast('Could not read file: '+err.message); }
+}
+function modalSheet(idx) {
+  modalCtx.sheetIdx = idx;
+  modalCtx.map = detectColumns(modalCtx.kind, modalCtx.sheets[idx].rows);
+  renderModal();
+}
+async function modalSave() {
+  const c = modalCtx;
+  const parsed = c._parsed;
+  if (!parsed || parsed.list.length===0) return;
+  const btn = $('#mSave');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="inline-block spin">◌</span> Saving…';
+
+  let ok = false;
+  if (c.kind==='yhh' || c.kind==='ss') {
+    ok = await saveStock(c.kind, parsed.map, Object.keys(parsed.map).length, c.fileName);
+    if (ok) toast(`${c.kind.toUpperCase()} stock updated · ${Object.keys(parsed.map).length.toLocaleString()} parts`);
+  } else if (c.kind==='order') {
+    const inv = (c.invoiceNo||'').trim();
+    const lines = parsed.list.map(x=>({ partNo:x.partNo, orderQty:x.qty, desc:x.desc }));
+    ok = await saveOrder(inv, c.party, c.note, lines);
+    if (ok) { toast(`Invoice ${inv} saved · ${lines.length} lines`); closeModal(); await openInvoice(inv); return; }
+  } else if (c.kind==='packing') {
+    const lines = parsed.list.map(x=>({ partNo:x.partNo, qty:x.qty }));
+    const label = (c.fileName||'Packing slip');
+    ok = await addSlip(label, lines);
+    if (ok) toast(`Packing slip added · ${lines.length} lines`);
+  }
+  if (ok) closeModal();
+  else { btn.disabled=false; btn.textContent='Save to cloud'; }
+}
+
+// ============================================================
+// RENDER — stock strip
+// ============================================================
+function renderStockStrip() {
+  const el = $('#stockStrip');
+  function chip(kind, label) {
+    const s = state.stock[kind];
+    if (s) {
+      return `
+        <button onclick="openModal('${kind}')" class="group inline-flex items-center gap-2 px-3 py-1.5 bg-cream rounded-full border border-cream-deep hover:border-lav-300 transition">
+          <span class="w-1.5 h-1.5 rounded-full bg-mint-500"></span>
+          <span class="text-[11px] font-mono"><b>${label}</b> ${s.count.toLocaleString()} parts</span>
+          <span class="text-[10px] text-ink-faint font-mono">· ${timeAgo(s.updatedAt)}</span>
+          <span class="text-[10px] text-lav-700 font-mono opacity-0 group-hover:opacity-100 transition">update</span>
+        </button>
+      `;
+    }
+    return `
+      <button onclick="openModal('${kind}')" class="inline-flex items-center gap-2 px-3 py-1.5 bg-cream rounded-full border border-dashed border-cream-deep hover:border-lav-300 transition">
+        <span class="w-1.5 h-1.5 rounded-full bg-ink-faint"></span>
+        <span class="text-[11px] font-mono text-ink-mute"><b>${label}</b> not loaded — upload</span>
+      </button>
+    `;
+  }
+  el.innerHTML = chip('yhh','YHH') + chip('ss','SS');
+}
+
+// ============================================================
+// RENDER — workspace (invoice list OR active invoice)
+// ============================================================
+function renderWorkspace() {
+  const ws = $('#workspace');
+  if (state.active) { ws.innerHTML = renderActiveInvoice(); bindActiveInvoice(); }
+  else { ws.innerHTML = renderInvoiceList(); }
+}
+
+function renderInvoiceList() {
+  const list = state.invoices;
+  let html = `
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="text-2xl sm:text-3xl font-medium">
+        Invoices.
+        <span class="font-serif italic text-ink-mute font-normal">Pick up where you left off.</span>
+      </h2>
+      <button onclick="openModal('order')" class="bg-ink text-cream rounded-full px-5 py-2.5 text-[13px] font-medium hover:bg-ink-soft transition flex items-center gap-2">
+        <span class="text-base leading-none">+</span> New invoice
+      </button>
+    </div>
+  `;
+  if (list.length === 0) {
+    html += `
+      <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card p-12 text-center">
+        <div class="text-4xl mb-3 opacity-40">📋</div>
+        <div class="text-base font-medium mb-1">No invoices yet</div>
+        <div class="text-sm text-ink-mute mb-5">Create one — upload the order and give it an invoice number.</div>
+        <button onclick="openModal('order')" class="bg-ink text-cream rounded-full px-6 py-3 text-sm font-medium hover:bg-ink-soft transition">+ New invoice</button>
+      </div>
+    `;
+    return html;
+  }
+  html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">`;
+  for (const inv of list) {
+    html += `
+      <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card p-5 card-lift cursor-pointer group" onclick="openInvoice('${esc(inv.invoice_no)}')">
+        <div class="flex items-start justify-between mb-3">
+          <div class="min-w-0">
+            <div class="font-mono text-[13px] text-lav-700 font-medium truncate">${esc(inv.invoice_no)}</div>
+            <div class="text-sm font-medium tracking-tight mt-0.5 truncate">${esc(inv.party_name || '—')}</div>
+          </div>
+          <button onclick="event.stopPropagation();deleteInvoice('${esc(inv.invoice_no)}')" class="text-ink-faint hover:text-ink text-sm shrink-0 opacity-0 group-hover:opacity-100 transition">&times;</button>
+        </div>
+        <div class="flex items-center justify-between pt-3 border-t border-cream-deep/60">
+          <div class="text-[11px] font-mono text-ink-mute">${inv.line_count} lines · ${(inv.total_qty||0).toLocaleString()} qty</div>
+          <div class="text-[10px] uppercase tracking-wider text-ink-faint font-mono">${timeAgo(inv.updated_at)}</div>
+        </div>
+      </div>
+    `;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderActiveInvoice() {
+  const a = state.active;
+  const r = state.report;
+  const totalOrder = a.orderLines.reduce((x,l)=>x+l.orderQty,0);
+  let pkPct=0, yhhPct=0, pboPct=0, shortPct=0;
+  if (r && totalOrder>0) {
+    const tp = r.overview.reduce((x,o)=>x+Math.min(o.orderQty,o.packed),0);
+    const ty = r.overview.reduce((x,o)=>x+o.useYhh,0);
+    const tb = r.overview.reduce((x,o)=>x+o.usePbo,0);
+    const ts = r.overview.reduce((x,o)=>x+o.stillShort,0);
+    pkPct = tp/totalOrder*100; yhhPct = ty/totalOrder*100;
+    pboPct = tb/totalOrder*100; shortPct = ts/totalOrder*100;
+  }
+  const slipQty = a.slips.reduce((x,s)=>x+s.totalQty,0);
+
+  let html = `
+    <div class="flex items-baseline justify-between mb-6 flex-wrap gap-2">
+      <button onclick="closeInvoice()" class="text-[11px] uppercase tracking-wider text-ink-mute hover:text-ink font-mono transition flex items-center gap-1.5">
+        <span>←</span> All invoices
+      </button>
+      <button onclick="deleteInvoice('${esc(a.invoiceNo)}')" class="text-[11px] uppercase tracking-wider text-ink-faint hover:text-ink font-mono transition">Delete invoice</button>
+    </div>
+
+    <!-- Invoice header card -->
+    <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card p-6 sm:p-8 mb-5">
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+        <div>
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-mono mb-1">Invoice</div>
+          <div class="text-3xl sm:text-4xl font-medium tracking-tight font-mono">${esc(a.invoiceNo)}</div>
+          <div class="text-sm text-ink-mute mt-1">${esc(a.partyName||'No party set')} · ${a.orderLines.length} lines · ${totalOrder.toLocaleString()} qty</div>
+        </div>
+        <div class="text-right">
+          <div class="text-[11px] uppercase tracking-wider text-ink-mute font-mono mb-1">Fulfilled</div>
+          <div class="text-5xl sm:text-6xl font-medium tracking-tight leading-none">${Math.round(pkPct)}<span class="text-ink-faint text-2xl">%</span></div>
+          <div class="text-[11px] text-ink-mute font-mono mt-1">packed &amp; sent</div>
+        </div>
+      </div>
+
+      <!-- Segmented progress -->
+      <div class="flex h-3 rounded-full overflow-hidden bg-cream-dark mb-3">
+        <div class="seg bg-mint-500" style="width:${pkPct}%"></div>
+        <div class="seg bg-lav-500" style="width:${yhhPct}%"></div>
+        <div class="seg bg-peach-500" style="width:${pboPct}%"></div>
+        <div class="seg bg-ink/25" style="width:${shortPct}%"></div>
+      </div>
+      <div class="flex flex-wrap gap-x-5 gap-y-1 text-[11px] font-mono">
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-mint-500"></span>Packed ${Math.round(pkPct)}%</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-lav-500"></span>In YHH, ready ${Math.round(yhhPct)}%</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-peach-500"></span>Order from SS ${Math.round(pboPct)}%</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-ink/25"></span>Shortfall ${Math.round(shortPct)}%</span>
+      </div>
+      ${(!state.stock.yhh || !state.stock.ss) ? `
+        <div class="mt-4 text-[11px] text-ink bg-peach-100 rounded-lg px-3 py-2 font-medium">
+          ${!state.stock.yhh && !state.stock.ss ? 'YHH and SS stock not loaded' : !state.stock.yhh ? 'YHH stock not loaded' : 'SS stock not loaded'} — report uses what is available. Update stock from the strip above.
+        </div>` : ''}
+    </div>
+
+    <!-- Packing slips -->
+    <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card overflow-hidden mb-5">
+      <div class="p-5 sm:p-6 border-b border-cream-deep/60 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-1 h-10 rounded-full bg-mint-500"></div>
+          <div>
+            <div class="text-base font-medium tracking-tight">Packing slips</div>
+            <div class="text-xs text-ink-mute mt-0.5">${a.slips.length} slip${a.slips.length===1?'':'s'} · ${slipQty.toLocaleString()} units packed so far</div>
+          </div>
+        </div>
+        <button onclick="openModal('packing')" class="bg-ink text-cream rounded-full px-5 py-2.5 text-[13px] font-medium hover:bg-ink-soft transition flex items-center gap-2">
+          <span class="text-base leading-none">+</span> Add packing slip
+        </button>
+      </div>
+  `;
+  if (a.slips.length === 0) {
+    html += `<div class="p-10 text-center text-ink-mute font-mono text-sm">No packing slips yet — add one as you pack</div>`;
+  } else {
+    html += `<div class="divide-y divide-cream-deep/40">`;
+    a.slips.forEach((s, i) => {
+      html += `
+        <div class="flex items-center justify-between px-5 sm:px-6 py-3.5 hover:bg-cream-dark/20 transition">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-7 h-7 rounded-full bg-mint-300 flex items-center justify-center text-[11px] font-mono font-semibold shrink-0">${i+1}</div>
+            <div class="min-w-0">
+              <div class="text-sm font-medium truncate">${esc(s.label||'Packing slip')}</div>
+              <div class="text-[11px] font-mono text-ink-mute">${fmtDate(s.uploadedAt)} · ${s.lineCount} lines · ${s.totalQty.toLocaleString()} qty</div>
+            </div>
+          </div>
+          <button onclick="deleteSlip(${s.id})" class="text-ink-faint hover:text-ink text-sm shrink-0 ml-3">Remove</button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  // Order lines (collapsed reference)
+  html += `
+    <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card overflow-hidden">
+      <button onclick="document.getElementById('orderLinesBody').classList.toggle('hidden')" class="w-full p-5 sm:p-6 flex items-center justify-between text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-1 h-10 rounded-full bg-ink/30"></div>
+          <div>
+            <div class="text-base font-medium tracking-tight">Order lines</div>
+            <div class="text-xs text-ink-mute mt-0.5">${a.orderLines.length} parts · the original order</div>
+          </div>
+        </div>
+        <span class="text-ink-faint text-xs font-mono">show / hide</span>
+      </button>
+      <div id="orderLinesBody" class="hidden overflow-x-auto scroll-area border-t border-cream-deep/60">
+        <table class="w-full text-sm">
+          <thead><tr class="bg-cream-dark/40">
+            <th class="text-left py-2.5 px-5 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Part No</th>
+            <th class="text-left py-2.5 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Description</th>
+            <th class="text-right py-2.5 px-5 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Order qty</th>
+          </tr></thead>
+          <tbody>
+            ${a.orderLines.map(l=>`<tr class="border-t border-cream-deep/40">
+              <td class="py-2.5 px-5 font-mono text-[12px] text-lav-700">${esc(l.partNo)}</td>
+              <td class="py-2.5 px-3 text-xs text-ink-mute max-w-xs truncate">${esc(l.desc||'—')}</td>
+              <td class="py-2.5 px-5 text-right font-mono">${l.orderQty.toLocaleString()}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  return html;
+}
+function bindActiveInvoice() { /* placeholder for future bindings */ }
+
+// ============================================================
+// RENDER — KPI card
+// ============================================================
+function renderKPI() {
+  const a = state.active, r = state.report;
+  if (!a) {
+    $('#kpiInvoice').textContent = '— none —';
+    $('#kpiParty').textContent = 'Open or create an invoice';
+    $('#kpiPacked').textContent = '—';
+    $('#kpiYhh').textContent = '—';
+    $('#kpiPbo').textContent = '—';
+    return;
+  }
+  $('#kpiInvoice').textContent = a.invoiceNo;
+  $('#kpiParty').textContent = a.partyName || 'No party set';
+  if (r) {
+    const totalOrder = a.orderLines.reduce((x,l)=>x+l.orderQty,0) || 1;
+    const tp = r.overview.reduce((x,o)=>x+Math.min(o.orderQty,o.packed),0);
+    const ty = r.overview.reduce((x,o)=>x+o.useYhh,0);
+    const tb = r.overview.reduce((x,o)=>x+o.usePbo,0);
+    $('#kpiPacked').textContent = Math.round(tp/totalOrder*100)+'%';
+    $('#kpiYhh').textContent = Math.round(ty/totalOrder*100)+'%';
+    $('#kpiPbo').textContent = Math.round(tb/totalOrder*100)+'%';
+  }
+}
+
+// ============================================================
+// RENDER — report tabs
+// ============================================================
+function renderReport() {
+  const r = state.report;
+  if (!r) { $('#reportSection').classList.add('hidden'); return; }
+  $('#reportSection').classList.remove('hidden');
+  $('#tabCountPacked').textContent = r.done.length;
+  $('#tabCountYHH').textContent = r.fromYHH.length;
+  $('#tabCountPBO').textContent = r.pbo.length;
+  $('#tabCountShort').textContent = r.shortfall.length;
+  const active = document.querySelector('.tab-btn.bg-ink');
+  showTab(active ? active.dataset.tab : 'overview');
+}
+function showTab(name) {
+  $$('.tab-btn').forEach(b=>{
+    const on = b.dataset.tab===name;
+    b.classList.toggle('bg-ink',on);
+    b.classList.toggle('text-cream',on);
+    b.classList.toggle('text-ink-mute',!on);
+  });
+  const r = state.report; if (!r) return;
+  const el = $('#reportContent');
+  if (name==='overview') el.innerHTML = renderOverview();
+  else if (name==='packed') el.innerHTML = renderPacked();
+  else if (name==='yhh') el.innerHTML = renderYhhPick();
+  else if (name==='pbo') el.innerHTML = renderPbo();
+  else if (name==='short') el.innerHTML = renderShortfall();
+}
+function badge(text, color) {
+  const c = { mint:'bg-mint-300 text-ink', lav:'bg-lav-100 text-lav-700', peach:'bg-peach-100 text-ink', ink:'bg-ink text-cream' };
+  return `<span class="inline-block px-2 py-0.5 ${c[color]||'bg-cream-dark text-ink-mute'} rounded-full text-[10px] font-medium uppercase tracking-wider">${text}</span>`;
+}
+function stat(label, value, color) {
+  const c = { ink:'text-ink', mint:'text-mint-500', lav:'text-lav-700', peach:'text-peach-500' };
+  return `<div>
+    <div class="text-[10px] uppercase tracking-wider text-ink-mute font-mono mb-1.5">${label}</div>
+    <div class="text-2xl sm:text-3xl font-medium tracking-tight ${c[color]||'text-ink'}">${(value||0).toLocaleString()}</div>
+  </div>`;
+}
 function renderOverview() {
   const r = state.report;
-  const totalOrder = state.zones.order.list.reduce((a, b) => a + b.orderQty, 0);
-  const totalPacked = r.overview.reduce((a, b) => a + Math.min(b.orderQty, b.packed), 0);
-  const totalYhh = r.overview.reduce((a, b) => a + b.useYhh, 0);
-  const totalPbo = r.overview.reduce((a, b) => a + b.usePbo, 0);
-  const totalShort = r.overview.reduce((a, b) => a + b.stillShort, 0);
-  const pct = totalOrder ? Math.round(((totalPacked + totalYhh + totalPbo) / totalOrder) * 100) : 0;
-
+  const totalOrder = state.active.orderLines.reduce((a,b)=>a+b.orderQty,0);
+  const tp = r.overview.reduce((a,b)=>a+Math.min(b.orderQty,b.packed),0);
+  const ty = r.overview.reduce((a,b)=>a+b.useYhh,0);
+  const tb = r.overview.reduce((a,b)=>a+b.usePbo,0);
+  const ts = r.overview.reduce((a,b)=>a+b.stillShort,0);
   return `
     <div class="space-y-6">
       <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card p-6 sm:p-8">
-        <div class="flex flex-wrap items-end justify-between gap-6 mb-6">
-          <div>
-            <div class="text-[11px] uppercase tracking-wider text-ink-mute font-mono mb-2">Fulfillability</div>
-            <div class="text-6xl sm:text-7xl font-medium tracking-tight leading-none">
-              ${pct}<span class="text-ink-faint text-3xl">%</span>
-            </div>
-          </div>
-          <button onclick="exportFullReport()" class="bg-ink text-cream rounded-full px-5 py-3 text-[13px] font-medium hover:bg-ink-soft transition flex items-center gap-2">
-            <span>Export full report</span><span>↓</span>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="text-base font-medium tracking-tight">Fulfillment summary</div>
+          <button onclick="exportFull()" class="bg-ink text-cream rounded-full px-5 py-2.5 text-[13px] font-medium hover:bg-ink-soft transition flex items-center gap-2">
+            <span>Export report</span><span>↓</span>
           </button>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 pt-6 border-t border-cream-deep/60">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
           ${stat('Order qty', totalOrder, 'ink')}
-          ${stat('Already packed', totalPacked, 'mint')}
-          ${stat('Pack from YHH', totalYhh, 'lav')}
-          ${stat('PBO total', totalPbo, 'peach')}
-          ${stat('Shortfall', totalShort, 'red')}
+          ${stat('Packed', tp, 'mint')}
+          ${stat('Pack from YHH', ty, 'lav')}
+          ${stat('Order from SS', tb, 'peach')}
+          ${stat('Shortfall', ts, 'ink')}
         </div>
       </div>
-
       <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card overflow-hidden">
         <div class="p-5 sm:p-6 border-b border-cream-deep/60">
           <div class="text-base font-medium tracking-tight">All order lines</div>
-          <div class="text-xs text-ink-mute mt-0.5">${r.overview.length} parts · breakdown per line</div>
+          <div class="text-xs text-ink-mute mt-0.5">${r.overview.length} parts · cumulative across all packing slips</div>
         </div>
         <div class="overflow-x-auto scroll-area">
           <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-cream-dark/40">
-                <th class="text-left py-3 px-5 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Part No</th>
-                <th class="text-left py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Description</th>
-                <th class="text-right py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Order</th>
-                <th class="text-right py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Packed</th>
-                <th class="text-right py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">YHH</th>
-                <th class="text-right py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">PC</th>
-                <th class="text-right py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">PBO</th>
-                <th class="text-right py-3 px-3 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Short</th>
-                <th class="text-left py-3 px-5 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">Status</th>
-              </tr>
-            </thead>
+            <thead><tr class="bg-cream-dark/40">
+              ${['Part No','Description','Order','Packed','YHH','SS','PBO','Short','Status'].map((h,i)=>
+                `<th class="${i<2?'text-left':(i===8?'text-left':'text-right')} py-3 px-${i===0||i===8?'5':'3'} text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">${h}</th>`).join('')}
+            </tr></thead>
             <tbody>
-              ${r.overview.map(x => `
-                <tr class="border-t border-cream-deep/40 hover:bg-cream-dark/20 transition">
-                  <td class="py-3 px-5 font-mono text-[12px] text-lav-700 font-medium">${x.partNo}</td>
-                  <td class="py-3 px-3 text-xs text-ink-mute max-w-xs truncate">${x.desc || '—'}</td>
-                  <td class="py-3 px-3 text-right font-mono">${x.orderQty.toLocaleString()}</td>
-                  <td class="py-3 px-3 text-right font-mono ${x.packed > 0 ? 'text-mint-500 font-medium' : 'text-ink-faint'}">${x.packed || '—'}</td>
-                  <td class="py-3 px-3 text-right font-mono ${x.useYhh > 0 ? 'text-lav-700 font-medium' : 'text-ink-faint'}">${x.useYhh || '—'}</td>
-                  <td class="py-3 px-3 text-right font-mono ${x.pc > 0 ? 'text-ink' : 'text-ink-faint'}">${x.pc || '—'}</td>
-                  <td class="py-3 px-3 text-right font-mono ${x.usePbo > 0 ? 'text-peach-500 font-medium' : 'text-ink-faint'}">${x.usePbo || '—'}</td>
-                  <td class="py-3 px-3 text-right font-mono ${x.stillShort > 0 ? 'text-ink font-semibold' : 'text-ink-faint'}">${x.stillShort || '—'}</td>
-                  <td class="py-3 px-5">${badge(x.status, x.statusColor)}</td>
-                </tr>
-              `).join('')}
+              ${r.overview.map(x=>`<tr class="border-t border-cream-deep/40 hover:bg-cream-dark/20 transition">
+                <td class="py-3 px-5 font-mono text-[12px] text-lav-700 font-medium">${esc(x.partNo)}</td>
+                <td class="py-3 px-3 text-xs text-ink-mute max-w-xs truncate">${esc(x.desc||'—')}</td>
+                <td class="py-3 px-3 text-right font-mono">${x.orderQty.toLocaleString()}</td>
+                <td class="py-3 px-3 text-right font-mono ${x.packed>0?'text-mint-500 font-medium':'text-ink-faint'}">${x.packed||'—'}</td>
+                <td class="py-3 px-3 text-right font-mono ${x.useYhh>0?'text-lav-700 font-medium':'text-ink-faint'}">${x.useYhh||'—'}</td>
+                <td class="py-3 px-3 text-right font-mono ${x.ss>0?'text-ink':'text-ink-faint'}">${x.ss||'—'}</td>
+                <td class="py-3 px-3 text-right font-mono ${x.usePbo>0?'text-peach-500 font-medium':'text-ink-faint'}">${x.usePbo||'—'}</td>
+                <td class="py-3 px-3 text-right font-mono ${x.stillShort>0?'text-ink font-semibold':'text-ink-faint'}">${x.stillShort||'—'}</td>
+                <td class="py-3 px-5">${badge(x.status,x.color)}</td>
+              </tr>`).join('')}
             </tbody>
           </table>
         </div>
@@ -816,222 +1075,192 @@ function renderOverview() {
     </div>
   `;
 }
-
-function tableSection({ title, sub, color, exportType, secondaryExport, empty, emptyMsg, cols, rows, total }) {
-  const colorBar = { mint:'bg-mint-500', lav:'bg-lav-500', peach:'bg-peach-500', ink:'bg-ink' }[color] || 'bg-ink';
+function tableSection({title,sub,color,exportType,secondaryExport,empty,emptyMsg,cols,rows,total}) {
+  const bar = {mint:'bg-mint-500',lav:'bg-lav-500',peach:'bg-peach-500',ink:'bg-ink'}[color]||'bg-ink';
   return `
     <div class="bg-white rounded-2xl border border-cream-deep/70 shadow-card overflow-hidden">
       <div class="p-5 sm:p-6 border-b border-cream-deep/60 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="w-1 h-10 rounded-full ${colorBar}"></div>
-          <div>
-            <div class="text-base font-medium tracking-tight">${title}</div>
-            <div class="text-xs text-ink-mute mt-0.5">${sub}</div>
-          </div>
+          <div class="w-1 h-10 rounded-full ${bar}"></div>
+          <div><div class="text-base font-medium tracking-tight">${title}</div><div class="text-xs text-ink-mute mt-0.5">${sub}</div></div>
         </div>
         <div class="flex gap-2">
-          ${secondaryExport ? `<button onclick="${secondaryExport.fn}()" class="bg-ink text-cream rounded-full px-4 py-2 text-[12px] font-medium hover:bg-ink-soft transition flex items-center gap-1.5">↓ ${secondaryExport.label}</button>` : ''}
-          <button onclick="exportCSV('${exportType}')" class="bg-cream/60 backdrop-blur border border-cream-deep rounded-full px-4 py-2 text-[12px] font-medium hover:bg-cream-dark transition flex items-center gap-1.5">↓ CSV</button>
+          ${secondaryExport?`<button onclick="${secondaryExport.fn}()" class="bg-ink text-cream rounded-full px-4 py-2 text-[12px] font-medium hover:bg-ink-soft transition">↓ ${secondaryExport.label}</button>`:''}
+          <button onclick="exportCSV('${exportType}')" class="bg-cream/60 border border-cream-deep rounded-full px-4 py-2 text-[12px] font-medium hover:bg-cream-dark transition">↓ CSV</button>
         </div>
       </div>
-      ${empty ? `
-        <div class="p-16 text-center text-ink-mute font-mono text-sm">
-          <div class="text-4xl mb-3 opacity-40">·</div>
-          ${emptyMsg}
-        </div>
-      ` : `
+      ${empty?`<div class="p-16 text-center text-ink-mute font-mono text-sm"><div class="text-4xl mb-3 opacity-40">·</div>${emptyMsg}</div>`:`
         <div class="overflow-x-auto scroll-area">
           <table class="w-full text-sm">
-            <thead>
-              <tr class="bg-cream-dark/40">
-                ${cols.map((c, i) => `<th class="${(i === 0 || i === 1) ? 'text-left' : 'text-right'} py-3 px-5 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">${c}</th>`).join('')}
-              </tr>
-            </thead>
+            <thead><tr class="bg-cream-dark/40">
+              ${cols.map((c,i)=>`<th class="${(i<2)?'text-left':'text-right'} py-3 px-5 text-[10px] uppercase tracking-wider text-ink-mute font-medium font-mono">${c}</th>`).join('')}
+            </tr></thead>
             <tbody>
-              ${rows.map(row => `
-                <tr class="border-t border-cream-deep/40 hover:bg-cream-dark/20 transition">
-                  ${row.map(c => `<td class="py-3 px-5 ${c.cls || ''}">${typeof c.v === 'number' ? c.v.toLocaleString() : c.v}</td>`).join('')}
-                </tr>
-              `).join('')}
+              ${rows.map(row=>`<tr class="border-t border-cream-deep/40 hover:bg-cream-dark/20 transition">
+                ${row.map(c=>`<td class="py-3 px-5 ${c.cls||''}">${typeof c.v==='number'?c.v.toLocaleString():c.v}</td>`).join('')}
+              </tr>`).join('')}
             </tbody>
-            <tfoot>
-              <tr class="border-t-2 border-cream-deep bg-cream-dark/30">
-                ${total.map((c, i) => `<td class="py-3 px-5 ${i === 0 ? 'text-[10px] uppercase tracking-wider font-mono text-ink-mute font-medium' : 'text-right font-mono font-semibold'}">${i === 0 && c === '' ? 'Total' : (typeof c === 'number' ? c.toLocaleString() : c)}</td>`).join('')}
-              </tr>
-            </tfoot>
+            <tfoot><tr class="border-t-2 border-cream-deep bg-cream-dark/30">
+              ${total.map((c,i)=>`<td class="py-3 px-5 ${i===0?'text-[10px] uppercase tracking-wider font-mono text-ink-mute font-medium':'text-right font-mono font-semibold'}">${i===0&&c===''?'Total':(typeof c==='number'?c.toLocaleString():c)}</td>`).join('')}
+            </tr></tfoot>
           </table>
         </div>
       `}
     </div>
   `;
 }
-
 function renderPacked() {
   const r = state.report.done;
   return tableSection({
-    title: 'Already packed',
-    sub: `${r.length} parts · in packing slip — no action needed`,
-    color: 'mint',
-    exportType: 'packed',
-    empty: r.length === 0,
-    emptyMsg: 'No items fully packed yet',
-    cols: ['Part No', 'Description', 'Order qty', 'Packed qty'],
-    rows: r.map(x => [
-      { v: x.partNo, cls: 'font-mono text-lav-700 font-medium text-[12px]' },
-      { v: x.desc || '—', cls: 'text-ink-mute text-xs' },
-      { v: x.orderQty, cls: 'font-mono text-right' },
-      { v: x.packed, cls: 'font-mono text-right text-mint-500 font-medium' },
+    title:'Already packed', sub:`${r.length} parts fully packed across all slips — no action needed`,
+    color:'mint', exportType:'packed', empty:r.length===0, emptyMsg:'Nothing fully packed yet',
+    cols:['Part No','Description','Order qty','Packed qty'],
+    rows:r.map(x=>[
+      {v:esc(x.partNo),cls:'font-mono text-lav-700 font-medium text-[12px]'},
+      {v:esc(x.desc||'—'),cls:'text-ink-mute text-xs'},
+      {v:x.orderQty,cls:'font-mono text-right'},
+      {v:x.packed,cls:'font-mono text-right text-mint-500 font-medium'},
     ]),
-    total: ['', '', r.reduce((a, b) => a + b.orderQty, 0), r.reduce((a, b) => a + b.packed, 0)],
+    total:['','',r.reduce((a,b)=>a+b.orderQty,0),r.reduce((a,b)=>a+b.packed,0)],
   });
 }
-
 function renderYhhPick() {
   const r = state.report.fromYHH;
   return tableSection({
-    title: 'YHH pick list',
-    sub: `${r.length} parts · ${r.reduce((a, b) => a + b.packFromYhh, 0).toLocaleString()} units to pull from warehouse`,
-    color: 'lav',
-    exportType: 'yhh',
-    empty: r.length === 0,
-    emptyMsg: 'Nothing to pack from YHH',
-    cols: ['Part No', 'Description', 'Order qty', 'Packed', 'YHH stock', 'Pack from YHH'],
-    rows: r.map(x => [
-      { v: x.partNo, cls: 'font-mono text-lav-700 font-medium text-[12px]' },
-      { v: x.desc || '—', cls: 'text-ink-mute text-xs' },
-      { v: x.orderQty, cls: 'font-mono text-right' },
-      { v: x.packed || '—', cls: 'font-mono text-right ' + (x.packed > 0 ? 'text-mint-500' : 'text-ink-faint') },
-      { v: x.yhh, cls: 'font-mono text-right' },
-      { v: x.packFromYhh, cls: 'font-mono text-right text-lav-700 font-medium' },
+    title:'YHH pick list', sub:`${r.length} parts · ${r.reduce((a,b)=>a+b.packFromYhh,0).toLocaleString()} units to pull from warehouse`,
+    color:'lav', exportType:'yhh', empty:r.length===0, emptyMsg:'Nothing to pack from YHH',
+    cols:['Part No','Description','Order qty','Packed','YHH stock','Pack from YHH'],
+    rows:r.map(x=>[
+      {v:esc(x.partNo),cls:'font-mono text-lav-700 font-medium text-[12px]'},
+      {v:esc(x.desc||'—'),cls:'text-ink-mute text-xs'},
+      {v:x.orderQty,cls:'font-mono text-right'},
+      {v:x.packed||'—',cls:'font-mono text-right '+(x.packed>0?'text-mint-500':'text-ink-faint')},
+      {v:x.yhh,cls:'font-mono text-right'},
+      {v:x.packFromYhh,cls:'font-mono text-right text-lav-700 font-medium'},
     ]),
-    total: ['', '', '', '', '', r.reduce((a, b) => a + b.packFromYhh, 0)],
+    total:['','','','','',r.reduce((a,b)=>a+b.packFromYhh,0)],
   });
 }
-
 function renderPbo() {
   const r = state.report.pbo;
-  const total = r.reduce((a, b) => a + b.pboQty, 0);
+  const total = r.reduce((a,b)=>a+b.pboQty,0);
   return tableSection({
-    title: 'PBO list',
-    sub: `${r.length} parts · ${total.toLocaleString()} units to order from Super Stockist`,
-    color: 'peach',
-    exportType: 'pbo',
-    secondaryExport: { label: 'PBO Excel', fn: 'exportPboExcel' },
-    empty: r.length === 0,
-    emptyMsg: 'No PBO needed — fulfillable from packing + YHH alone',
-    cols: ['Part No', 'Description', 'Order qty', 'Packed', 'From YHH', 'PC stock', 'Order from SS'],
-    rows: r.map(x => [
-      { v: x.partNo, cls: 'font-mono text-lav-700 font-medium text-[12px]' },
-      { v: x.desc || '—', cls: 'text-ink-mute text-xs' },
-      { v: x.orderQty, cls: 'font-mono text-right' },
-      { v: x.packed || '—', cls: 'font-mono text-right ' + (x.packed > 0 ? 'text-mint-500' : 'text-ink-faint') },
-      { v: x.packFromYhh || '—', cls: 'font-mono text-right ' + (x.packFromYhh > 0 ? 'text-lav-700' : 'text-ink-faint') },
-      { v: x.pcAvail, cls: 'font-mono text-right' },
-      { v: x.pboQty, cls: 'font-mono text-right text-peach-500 font-medium' },
+    title:'PBO list', sub:`${r.length} parts · ${total.toLocaleString()} units to order from Super Stockist`,
+    color:'peach', exportType:'pbo', secondaryExport:{label:'PBO Excel',fn:'exportPboExcel'},
+    empty:r.length===0, emptyMsg:'No PBO needed — fulfillable from packing + YHH alone',
+    cols:['Part No','Description','Order qty','Packed','From YHH','SS stock','Order from SS'],
+    rows:r.map(x=>[
+      {v:esc(x.partNo),cls:'font-mono text-lav-700 font-medium text-[12px]'},
+      {v:esc(x.desc||'—'),cls:'text-ink-mute text-xs'},
+      {v:x.orderQty,cls:'font-mono text-right'},
+      {v:x.packed||'—',cls:'font-mono text-right '+(x.packed>0?'text-mint-500':'text-ink-faint')},
+      {v:x.packFromYhh||'—',cls:'font-mono text-right '+(x.packFromYhh>0?'text-lav-700':'text-ink-faint')},
+      {v:x.ssAvail,cls:'font-mono text-right'},
+      {v:x.pboQty,cls:'font-mono text-right text-peach-500 font-medium'},
     ]),
-    total: ['', '', '', '', '', '', total],
+    total:['','','','','','',total],
   });
 }
-
 function renderShortfall() {
   const r = state.report.shortfall;
   return tableSection({
-    title: 'Shortfall',
-    sub: `${r.length} parts · ${r.reduce((a, b) => a + b.shortQty, 0).toLocaleString()} units cannot be fulfilled from any source`,
-    color: 'ink',
-    exportType: 'short',
-    empty: r.length === 0,
-    emptyMsg: 'No shortfall — every part has a source',
-    cols: ['Part No', 'Description', 'Order qty', 'Packed', 'YHH', 'PC', 'Shortfall'],
-    rows: r.map(x => [
-      { v: x.partNo, cls: 'font-mono text-lav-700 font-medium text-[12px]' },
-      { v: x.desc || '—', cls: 'text-ink-mute text-xs' },
-      { v: x.orderQty, cls: 'font-mono text-right' },
-      { v: x.packed || '—', cls: 'font-mono text-right ' + (x.packed > 0 ? 'text-mint-500' : 'text-ink-faint') },
-      { v: x.yhh || '—', cls: 'font-mono text-right ' + (x.yhh > 0 ? 'text-lav-700' : 'text-ink-faint') },
-      { v: x.pc || '—', cls: 'font-mono text-right ' + (x.pc > 0 ? 'text-ink' : 'text-ink-faint') },
-      { v: x.shortQty, cls: 'font-mono text-right text-ink font-semibold' },
+    title:'Shortfall', sub:`${r.length} parts · ${r.reduce((a,b)=>a+b.shortQty,0).toLocaleString()} units not available from any source`,
+    color:'ink', exportType:'short', empty:r.length===0, emptyMsg:'No shortfall — every part has a source',
+    cols:['Part No','Description','Order qty','Packed','YHH','SS','Shortfall'],
+    rows:r.map(x=>[
+      {v:esc(x.partNo),cls:'font-mono text-lav-700 font-medium text-[12px]'},
+      {v:esc(x.desc||'—'),cls:'text-ink-mute text-xs'},
+      {v:x.orderQty,cls:'font-mono text-right'},
+      {v:x.packed||'—',cls:'font-mono text-right '+(x.packed>0?'text-mint-500':'text-ink-faint')},
+      {v:x.yhh||'—',cls:'font-mono text-right '+(x.yhh>0?'text-lav-700':'text-ink-faint')},
+      {v:x.ss||'—',cls:'font-mono text-right '+(x.ss>0?'text-ink':'text-ink-faint')},
+      {v:x.shortQty,cls:'font-mono text-right text-ink font-semibold'},
     ]),
-    total: ['', '', '', '', '', '', r.reduce((a, b) => a + b.shortQty, 0)],
+    total:['','','','','','',r.reduce((a,b)=>a+b.shortQty,0)],
   });
 }
 
-// === EXPORTS ===
-function csvCell(v) {
-  const s = String(v ?? '');
-  if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"' + s.replace(/"/g, '""') + '"';
-  return s;
+// ============================================================
+// EXPORTS
+// ============================================================
+function csvCell(v){const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function downloadCSV(rows,fn){
+  const csv=rows.map(r=>r.map(csvCell).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=fn; a.click();
 }
-function downloadCSV(rows, filename) {
-  const csv = rows.map(r => r.map(csvCell).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-}
-function exportCSV(type) {
-  if (!state.report) return;
-  const date = new Date().toISOString().split('T')[0];
-  const r = state.report;
-  if (type === 'packed') {
-    const rows = [['PART NO','DESCRIPTION','ORDER QTY','PACKED QTY']];
-    r.done.forEach(x => rows.push([x.partNo, x.desc, x.orderQty, x.packed]));
-    downloadCSV(rows, `Packed_${date}.csv`);
-  } else if (type === 'yhh') {
-    const rows = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH STOCK','PACK FROM YHH']];
-    r.fromYHH.forEach(x => rows.push([x.partNo, x.desc, x.orderQty, x.packed, x.yhh, x.packFromYhh]));
-    downloadCSV(rows, `YHH_Pick_${date}.csv`);
-  } else if (type === 'pbo') {
-    const rows = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','FROM YHH','PC AVAIL','ORDER FROM SS']];
-    r.pbo.forEach(x => rows.push([x.partNo, x.desc, x.orderQty, x.packed, x.packFromYhh, x.pcAvail, x.pboQty]));
-    downloadCSV(rows, `PBO_${date}.csv`);
-  } else if (type === 'short') {
-    const rows = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH','PC','SHORTFALL']];
-    r.shortfall.forEach(x => rows.push([x.partNo, x.desc, x.orderQty, x.packed, x.yhh, x.pc, x.shortQty]));
-    downloadCSV(rows, `Shortfall_${date}.csv`);
+function invTag(){ return (state.active?state.active.invoiceNo:'order').replace(/[^A-Za-z0-9_-]/g,'_'); }
+function exportCSV(type){
+  const r=state.report; if(!r) return;
+  if(type==='packed'){
+    const rows=[['PART NO','DESCRIPTION','ORDER QTY','PACKED QTY']];
+    r.done.forEach(x=>rows.push([x.partNo,x.desc,x.orderQty,x.packed]));
+    downloadCSV(rows,`Packed_${invTag()}.csv`);
+  } else if(type==='yhh'){
+    const rows=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH STOCK','PACK FROM YHH']];
+    r.fromYHH.forEach(x=>rows.push([x.partNo,x.desc,x.orderQty,x.packed,x.yhh,x.packFromYhh]));
+    downloadCSV(rows,`YHH_Pick_${invTag()}.csv`);
+  } else if(type==='pbo'){
+    const rows=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','FROM YHH','SS AVAIL','ORDER FROM SS']];
+    r.pbo.forEach(x=>rows.push([x.partNo,x.desc,x.orderQty,x.packed,x.packFromYhh,x.ssAvail,x.pboQty]));
+    downloadCSV(rows,`PBO_${invTag()}.csv`);
+  } else if(type==='short'){
+    const rows=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH','SS','SHORTFALL']];
+    r.shortfall.forEach(x=>rows.push([x.partNo,x.desc,x.orderQty,x.packed,x.yhh,x.ss,x.shortQty]));
+    downloadCSV(rows,`Shortfall_${invTag()}.csv`);
   }
 }
-function exportPboExcel() {
-  if (!state.report || state.report.pbo.length === 0) { alert('No PBO items.'); return; }
-  const wb = XLSX.utils.book_new();
-  const data = [
-    ['PART NO','DESCRIPTION','ORDER QTY','PACKED','FROM YHH','PC AVAIL','ORDER FROM SS'],
-    ...state.report.pbo.map(x => [x.partNo, x.desc, x.orderQty, x.packed, x.packFromYhh, x.pcAvail, x.pboQty]),
-    ['','','','','','TOTAL', state.report.pbo.reduce((a, b) => a + b.pboQty, 0)]
-  ];
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  ws['!cols'] = [{wch:18},{wch:35},{wch:11},{wch:10},{wch:11},{wch:11},{wch:14}];
-  XLSX.utils.book_append_sheet(wb, ws, 'PBO');
-  XLSX.writeFile(wb, `PBO_${new Date().toISOString().split('T')[0]}.xlsx`);
+function exportPboExcel(){
+  const r=state.report; if(!r||r.pbo.length===0){toast('No PBO items');return;}
+  const wb=XLSX.utils.book_new();
+  const data=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','FROM YHH','SS AVAIL','ORDER FROM SS'],
+    ...r.pbo.map(x=>[x.partNo,x.desc,x.orderQty,x.packed,x.packFromYhh,x.ssAvail,x.pboQty]),
+    ['','','','','','TOTAL',r.pbo.reduce((a,b)=>a+b.pboQty,0)]];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=[{wch:18},{wch:35},{wch:11},{wch:10},{wch:11},{wch:11},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws,'PBO');
+  XLSX.writeFile(wb,`PBO_${invTag()}.xlsx`);
 }
-function exportFullReport() {
-  if (!state.report) return;
-  const wb = XLSX.utils.book_new();
-  const r = state.report;
-  const ov = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH STOCK','PC STOCK','PACK FROM YHH','PBO QTY','SHORTFALL','STATUS']];
-  r.overview.forEach(x => ov.push([x.partNo, x.desc, x.orderQty, x.packed, x.yhh, x.pc, x.useYhh, x.usePbo, x.stillShort, x.status]));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(ov), 'Overview');
-  const pbo = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','FROM YHH','PC AVAIL','ORDER FROM SS']];
-  r.pbo.forEach(x => pbo.push([x.partNo, x.desc, x.orderQty, x.packed, x.packFromYhh, x.pcAvail, x.pboQty]));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(pbo), 'PBO');
-  const yhh = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH STOCK','PACK FROM YHH']];
-  r.fromYHH.forEach(x => yhh.push([x.partNo, x.desc, x.orderQty, x.packed, x.yhh, x.packFromYhh]));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(yhh), 'YHH Pick');
-  const sh = [['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH','PC','SHORTFALL']];
-  r.shortfall.forEach(x => sh.push([x.partNo, x.desc, x.orderQty, x.packed, x.yhh, x.pc, x.shortQty]));
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sh), 'Shortfall');
-  XLSX.writeFile(wb, `Order_Fulfillment_${new Date().toISOString().split('T')[0]}.xlsx`);
+function exportFull(){
+  const r=state.report; if(!r) return;
+  const wb=XLSX.utils.book_new();
+  const ov=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH STOCK','SS STOCK','PACK FROM YHH','SS PBO QTY','SHORTFALL','STATUS']];
+  r.overview.forEach(x=>ov.push([x.partNo,x.desc,x.orderQty,x.packed,x.yhh,x.ss,x.useYhh,x.usePbo,x.stillShort,x.status]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ov),'Overview');
+  const pbo=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','FROM YHH','SS AVAIL','ORDER FROM SS']];
+  r.pbo.forEach(x=>pbo.push([x.partNo,x.desc,x.orderQty,x.packed,x.packFromYhh,x.ssAvail,x.pboQty]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(pbo),'PBO');
+  const yh=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH STOCK','PACK FROM YHH']];
+  r.fromYHH.forEach(x=>yh.push([x.partNo,x.desc,x.orderQty,x.packed,x.yhh,x.packFromYhh]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(yh),'YHH Pick');
+  const sh=[['PART NO','DESCRIPTION','ORDER QTY','PACKED','YHH','SS','SHORTFALL']];
+  r.shortfall.forEach(x=>sh.push([x.partNo,x.desc,x.orderQty,x.packed,x.yhh,x.ss,x.shortQty]));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sh),'Shortfall');
+  XLSX.writeFile(wb,`Fulfillment_${invTag()}.xlsx`);
 }
 
-// === INIT ===
-document.getElementById('tabNav').addEventListener('click', e => {
-  const btn = e.target.closest('.tab-btn');
-  if (btn) showTab(btn.dataset.tab);
+// ============================================================
+// INIT
+// ============================================================
+$('#tabNav').addEventListener('click', e=>{
+  const b=e.target.closest('.tab-btn'); if(b) showTab(b.dataset.tab);
 });
+$('#modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
 
-for (const k of Object.keys(state.zones)) renderZone(k);
-updateKPI();
+(async function init(){
+  setCloud(false,'Connecting');
+  try {
+    await Promise.all([loadStock(), loadInvoices()]);
+    setCloud(true,'Live');
+  } catch(err) {
+    setCloud(false,'Offline');
+    toast('Cloud connection failed');
+  }
+  renderStockStrip();
+  renderWorkspace();
+  renderKPI();
+})();
 </script>
 </body>
 </html>
