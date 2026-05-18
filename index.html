@@ -169,6 +169,13 @@
   <section class="max-w-7xl mx-auto px-5 sm:px-8 pb-10" id="workspace"></section>
 
   <section id="reportSection" class="max-w-7xl mx-auto px-5 sm:px-8 pb-24 hidden">
+    <div class="mb-4">
+      <h2 class="text-2xl sm:text-3xl font-medium">
+        Fulfillment report.
+        <span class="font-serif italic text-ink-mute font-normal">The PBO list is here.</span>
+      </h2>
+      <p class="text-sm text-ink-mute mt-1">Tap <b>PBO</b> for the Super Stockist order list · <b>YHH Pick</b> for the warehouse pull list.</p>
+    </div>
     <div class="sticky-nav -mx-5 sm:mx-0 px-5 sm:px-0 py-3">
       <nav class="inline-flex p-1 bg-cream-dark/60 rounded-full border border-cream-deep/70 overflow-x-auto max-w-full" id="tabNav">
         <button class="tab-btn px-4 sm:px-5 py-2 rounded-full text-[12px] sm:text-[13px] font-medium transition bg-ink text-cream whitespace-nowrap" data-tab="overview">Overview</button>
@@ -753,18 +760,18 @@ function renderStockStrip() {
     const s = state.stock[kind];
     if (s) {
       return `
-        <button onclick="openModal('${kind}')" class="group inline-flex items-center gap-2 px-3 py-1.5 bg-cream rounded-full border border-cream-deep hover:border-lav-300 transition">
+        <button onclick="openModal('${kind}')" class="inline-flex items-center gap-2 pl-3 pr-1.5 py-1.5 bg-cream rounded-full border border-cream-deep hover:border-lav-300 transition">
           <span class="w-1.5 h-1.5 rounded-full bg-mint-500"></span>
-          <span class="text-[11px] font-mono"><b>${label}</b> ${s.count.toLocaleString()} parts</span>
-          <span class="text-[10px] text-ink-faint font-mono">· ${timeAgo(s.updatedAt)}</span>
-          <span class="text-[10px] text-lav-700 font-mono opacity-0 group-hover:opacity-100 transition">update</span>
+          <span class="text-[11px] font-mono"><b>${label}</b> ${s.count.toLocaleString()} parts · ${timeAgo(s.updatedAt)}</span>
+          <span class="text-[10px] uppercase tracking-wider bg-cream-dark text-ink-mute font-mono rounded-full px-2 py-0.5">Update</span>
         </button>
       `;
     }
     return `
-      <button onclick="openModal('${kind}')" class="inline-flex items-center gap-2 px-3 py-1.5 bg-cream rounded-full border border-dashed border-cream-deep hover:border-lav-300 transition">
-        <span class="w-1.5 h-1.5 rounded-full bg-ink-faint"></span>
-        <span class="text-[11px] font-mono text-ink-mute"><b>${label}</b> not loaded — upload</span>
+      <button onclick="openModal('${kind}')" class="inline-flex items-center gap-2 pl-3 pr-1.5 py-1.5 bg-peach-100 rounded-full border border-peach-300 hover:border-lav-300 transition">
+        <span class="w-1.5 h-1.5 rounded-full bg-peach-500"></span>
+        <span class="text-[11px] font-mono text-ink"><b>${label}</b> not loaded</span>
+        <span class="text-[10px] uppercase tracking-wider bg-ink text-cream font-mono rounded-full px-2 py-0.5">Upload</span>
       </button>
     `;
   }
@@ -878,9 +885,27 @@ function renderActiveInvoice() {
         <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-ink/25"></span>Shortfall ${Math.round(shortPct)}%</span>
       </div>
       ${(!state.stock.yhh || !state.stock.ss) ? `
-        <div class="mt-4 text-[11px] text-ink bg-peach-100 rounded-lg px-3 py-2 font-medium">
-          ${!state.stock.yhh && !state.stock.ss ? 'YHH and SS stock not loaded' : !state.stock.yhh ? 'YHH stock not loaded' : 'SS stock not loaded'} — report uses what is available. Update stock from the strip above.
+        <div class="mt-5 bg-peach-100 rounded-xl px-4 py-4">
+          <div class="text-[13px] text-ink font-medium mb-1">⚠ Stock not loaded — PBO can't be calculated yet</div>
+          <div class="text-[11px] text-ink-mute font-mono mb-3">
+            Without stock, every unpacked part shows as shortfall. Upload YHH &amp; SS stock to get the YHH pick list and the PBO list.
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="openModal('yhh')" class="bg-ink text-cream rounded-full px-4 py-2 text-[12px] font-medium hover:bg-ink-soft transition flex items-center gap-1.5">
+              ${state.stock.yhh ? '✓ YHH loaded' : '+ Upload YHH stock'}
+            </button>
+            <button onclick="openModal('ss')" class="bg-ink text-cream rounded-full px-4 py-2 text-[12px] font-medium hover:bg-ink-soft transition flex items-center gap-1.5">
+              ${state.stock.ss ? '✓ SS loaded' : '+ Upload SS stock'}
+            </button>
+          </div>
         </div>` : ''}
+      <div class="mt-5 pt-5 border-t border-cream-deep/60 flex flex-wrap items-center justify-between gap-3">
+        <div class="text-[11px] text-ink-mute font-mono">Full breakdown — Overview · Packed · YHH Pick · PBO · Shortfall</div>
+        <button onclick="document.getElementById('reportSection').scrollIntoView({behavior:'smooth',block:'start'})"
+          class="bg-lav-700 text-cream rounded-full px-5 py-2.5 text-[13px] font-medium hover:opacity-90 transition flex items-center gap-2">
+          <span>View PBO &amp; full report</span><span>↓</span>
+        </button>
+      </div>
     </div>
 
     <!-- Packing slips -->
