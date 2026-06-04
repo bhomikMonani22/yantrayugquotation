@@ -589,7 +589,7 @@ function renderModal() {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <div class="text-[11px] uppercase tracking-wider text-ink-mute font-medium mb-1">Invoice number *</div>
-          <input id="mInvoice" value="${esc(c.invoiceNo)}" oninput="modalCtx.invoiceNo=this.value"
+          <input id="mInvoice" value="${esc(c.invoiceNo)}" oninput="modalCtx.invoiceNo=this.value;updateSaveButton()"
             class="w-full px-3 py-2.5 rounded-lg border border-cream-deep bg-cream/40 focus:bg-white focus:border-ink-soft focus:outline-none transition font-mono text-sm"
             placeholder="INV-2026-001" autocomplete="off" autocorrect="off" spellcheck="false" />
         </div>
@@ -684,12 +684,19 @@ function renderModal() {
   const canSave = c.sheets && c._parsed && c._parsed.list.length>0 &&
                   (c.kind!=='order' || (c.invoiceNo||'').trim().length>0);
   body += `
-    <div class="flex items-center justify-end gap-2 p-5 sm:p-6 border-t border-cream-deep">
-      <button onclick="closeModal()" class="bg-cream/60 border border-cream-deep rounded-full px-5 py-2.5 text-sm font-medium hover:bg-cream-dark transition">Cancel</button>
-      <button id="mSave" ${canSave?'':'disabled'} onclick="modalSave()"
-        class="bg-ink text-cream rounded-full px-5 py-2.5 text-sm font-medium hover:bg-ink-soft transition ${canSave?'':'opacity-40 cursor-not-allowed'}">
-        Save to cloud
-      </button>
+    <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 p-5 sm:p-6 border-t border-cream-deep">
+      <div id="mSaveHint" class="text-[12px] text-peach-500 font-mono leading-snug ${canSave?'hidden':''}">
+        ${!c.sheets ? '↑ Drop the file above to start' :
+          (!c._parsed || c._parsed.list.length===0) ? '↑ Check column selection — no rows parsed' :
+          (c.kind==='order' && !(c.invoiceNo||'').trim()) ? '⚠ Type an invoice number above to enable save' : ''}
+      </div>
+      <div class="flex gap-2 sm:ml-auto justify-end">
+        <button onclick="closeModal()" class="bg-cream/60 border border-cream-deep rounded-full px-5 py-2.5 text-sm font-medium hover:bg-cream-dark transition">Cancel</button>
+        <button id="mSave" ${canSave?'':'disabled'} onclick="modalSave()"
+          class="bg-ink text-cream rounded-full px-5 py-2.5 text-sm font-medium hover:bg-ink-soft transition ${canSave?'':'opacity-30 cursor-not-allowed'}">
+          Save to cloud
+        </button>
+      </div>
     </div>
   `;
 
@@ -704,6 +711,27 @@ function renderModal() {
   }
 }
 
+function updateSaveButton() {
+  const c = modalCtx; if (!c) return;
+  const canSave = c.sheets && c._parsed && c._parsed.list.length>0 &&
+                  (c.kind!=='order' || (c.invoiceNo||'').trim().length>0);
+  const btn = document.getElementById('mSave');
+  if (btn) {
+    btn.disabled = !canSave;
+    btn.classList.toggle('opacity-30', !canSave);
+    btn.classList.toggle('cursor-not-allowed', !canSave);
+  }
+  const hint = document.getElementById('mSaveHint');
+  if (hint) hint.classList.toggle('hidden', canSave);
+  // toggle warning border on invoice input
+  const inv = document.getElementById('mInvoice');
+  if (inv && c.kind==='order') {
+    const needsInv = c.sheets && c._parsed && c._parsed.list.length>0 && !(c.invoiceNo||'').trim();
+    inv.classList.toggle('border-peach-500', needsInv);
+    inv.classList.toggle('border-cream-deep', !needsInv);
+  }
+}
+
 async function modalFile(ev) {
   const f = ev.target.files[0];
   if (f) await modalFileObj(f);
@@ -715,6 +743,10 @@ async function modalFileObj(file) {
     modalCtx.sheets = sheets;
     modalCtx.sheetIdx = autoPickSheet(modalCtx.kind, sheets);
     modalCtx.map = detectColumns(modalCtx.kind, sheets[modalCtx.sheetIdx].rows);
+    // Auto-fill invoice number from filename (order kind only)
+    if (modalCtx.kind === 'order' && !(modalCtx.invoiceNo||'').trim()) {
+      modalCtx.invoiceNo = file.name.replace(/\.(xlsx|xls|csv)$/i, '').trim();
+    }
     if (modalCtx.kind==='packing' && !$('#mLabel')) modalCtx.fileName = file.name;
     renderModal();
   } catch (err) { toast('Could not read file: '+err.message); }
